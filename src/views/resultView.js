@@ -156,26 +156,22 @@ function handleSaveHistory() {
   try {
     const sourceData = JSON.parse(sourceDataStr);
 
-    // Create history object
-    const historyItem = {
-      id: `cv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      name: sourceData.namaLengkap || "CV Ta'aruf",
-      generatedAt: new Date().toISOString(),
-      cvTextContent: cvText,
-      sourceData: sourceData,
-    };
+    // Save to localStorage using proper signature: saveHistory(formData, cvTextContent, customName)
+    const result = saveHistory(sourceData, cvText);
 
-    // Save to localStorage
-    saveHistory(historyItem);
+    if (result.success) {
+      showToast("CV berhasil disimpan ke history!", "success");
+      console.log("[ResultView] CV saved to history:", result.data?.id);
 
-    showToast("CV berhasil disimpan ke history!", "success");
-    console.log("[ResultView] CV saved to history:", historyItem.id);
-
-    // Disable button after saving
-    const btnSave = document.getElementById("btn-save-history");
-    if (btnSave) {
-      btnSave.disabled = true;
-      btnSave.innerHTML = '<i class="bi bi-check-circle"></i> Sudah Disimpan';
+      // Disable button after saving
+      const btnSave = document.getElementById("btn-save-history");
+      if (btnSave) {
+        btnSave.disabled = true;
+        btnSave.innerHTML = '<i class="bi bi-check-circle"></i> Sudah Disimpan';
+      }
+    } else {
+      showToast(result.message || "Gagal menyimpan ke history", "error");
+      console.error("[ResultView] Save history failed:", result);
     }
   } catch (err) {
     console.error("[ResultView] Failed to save history:", err);

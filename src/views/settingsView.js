@@ -1,9 +1,12 @@
 /**
  * @file settingsView.js
  * @description Settings Page View - App settings and information
- * @version 1.0
- * @date 2025-12-08
+ * @version 2.0
+ * @date 2025-01-27
  */
+
+import { clearAllData } from "../services/localStorageService.js";
+import { showToast } from "../components/ToastNotification.js";
 
 /**
  * Render Settings Page content
@@ -183,13 +186,24 @@ function attachEventListeners() {
         );
 
         if (doubleConfirm) {
-          console.log("[SettingsView] Reset all data");
-          // TODO: Implement clearAllData() in Phase 5
-          alert("Fitur Reset Data akan diimplementasikan di Phase 5");
+          console.log("[SettingsView] Clearing all data...");
 
-          // When implemented:
-          // localStorageService.clearAllData();
-          // window.location.reload();
+          const result = clearAllData();
+
+          if (result.success) {
+            showToast(
+              "Semua data berhasil dihapus. Halaman akan dimuat ulang...",
+              "success"
+            );
+
+            // Reload page after 1.5 seconds to show toast
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+          } else {
+            showToast(result.message || "Gagal menghapus data", "error");
+            console.error("[SettingsView] Clear data failed:", result.error);
+          }
         }
       }
     });

@@ -1,11 +1,18 @@
 /**
  * @file draftView.js
  * @description Draft Page View - Manage saved drafts
- * @version 1.0
- * @date 2025-12-08
+ * @version 2.0
+ * @date 2025-01-27
  */
 
 import { navigateTo } from "../router/router.js";
+import {
+  getDrafts,
+  getDraftById,
+  deleteDraft,
+} from "../services/localStorageService.js";
+import { showToast } from "../components/ToastNotification.js";
+import { loadDraftToForm } from "./formView.js";
 
 /**
  * Render Draft Page content
@@ -41,15 +48,21 @@ function renderDraftView() {
 function loadDrafts() {
   const container = document.getElementById("draft-list-container");
 
-  // TODO: Will be implemented in Phase 5
-  // For now, show empty state
-  const drafts = []; // getDrafts() from localStorageService
+  // Get drafts from localStorage
+  const drafts = getDrafts();
 
-  if (drafts.length === 0) {
+  // Sort by lastUpdated (newest first)
+  const sortedDrafts = drafts.sort(
+    (a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated)
+  );
+
+  if (sortedDrafts.length === 0) {
     renderEmptyState(container);
   } else {
-    renderDraftList(container, drafts);
+    renderDraftList(container, sortedDrafts);
   }
+
+  console.log(`[DraftView] Loaded ${sortedDrafts.length} drafts`);
 }
 
 /**
@@ -133,6 +146,62 @@ function renderDraftList(container, drafts) {
 }
 
 /**
+ * Handle load draft button click
+ * @param {string} draftId - Draft ID to load
+ */
+function handleLoadDraft(draftId) {
+  const draft = getDraftById(draftId);
+
+  if (!draft) {
+    showToast("Draft tidak ditemukan", "error");
+    return;
+  }
+
+  // Store draft data in sessionStorage for form to load
+  sessionStorage.setItem("taaruf_cv_draft_to_load", JSON.stringify(draft.data));
+
+  // Navigate to form
+  navigateTo("/form");
+
+  console.log("[DraftView] Loading draft:", draftId);
+  showToast("Memuat draft ke formulir...", "info");
+}
+
+/**
+ * Handle delete draft button click
+ * @param {string} draftId - Draft ID to delete
+ */
+function handleDeleteDraft(draftId) {
+  const draft = getDraftById(draftId);
+
+  if (!draft) {
+    showToast("Draft tidak ditemukan", "error");
+    return;
+  }
+
+  // Double confirmation
+  const confirmMessage = `Apakah Anda yakin ingin menghapus draft "${draft.name}"?\n\nTindakan ini tidak dapat dibatalkan.`;
+
+  if (!confirm(confirmMessage)) {
+    return;
+  }
+
+  // Delete draft
+  const result = deleteDraft(draftId);
+
+  if (result.success) {
+    showToast("Draft berhasil dihapus", "success");
+    console.log("[DraftView] Deleted draft:", draftId);
+
+    // Reload draft list
+    loadDrafts();
+  } else {
+    showToast(result.message || "Gagal menghapus draft", "error");
+    console.error("[DraftView] Delete failed:", result);
+  }
+}
+
+/**
  * Attach event listeners for draft actions
  */
 function attachDraftListeners() {
@@ -141,9 +210,7 @@ function attachDraftListeners() {
   loadButtons.forEach((button) => {
     button.addEventListener("click", (e) => {
       const draftId = e.currentTarget.getAttribute("data-id");
-      console.log("[DraftView] Load draft:", draftId);
-      // TODO: Implement load draft functionality in Phase 5
-      alert("Fitur Load Draft akan diimplementasikan di Phase 5");
+      handleLoadDraft(draftId);
     });
   });
 
@@ -152,11 +219,7 @@ function attachDraftListeners() {
   deleteButtons.forEach((button) => {
     button.addEventListener("click", (e) => {
       const draftId = e.currentTarget.getAttribute("data-id");
-      if (confirm("Apakah Anda yakin ingin menghapus draft ini?")) {
-        console.log("[DraftView] Delete draft:", draftId);
-        // TODO: Implement delete draft functionality in Phase 5
-        alert("Fitur Delete Draft akan diimplementasikan di Phase 5");
-      }
+      handleDeleteDraft(draftId);
     });
   });
 }

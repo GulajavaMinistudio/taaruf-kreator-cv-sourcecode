@@ -1,11 +1,17 @@
 /**
  * @file historyView.js
  * @description History Page View - View generated CV history
- * @version 1.0
- * @date 2025-12-08
+ * @version 2.0
+ * @date 2025-01-27
  */
 
 import { navigateTo } from "../router/router.js";
+import {
+  getHistory,
+  getHistoryById,
+  deleteHistory,
+} from "../services/localStorageService.js";
+import { showToast } from "../components/ToastNotification.js";
 
 /**
  * Render History Page content
@@ -63,15 +69,21 @@ function renderHistoryView() {
 function loadHistory() {
   const container = document.getElementById("history-list-container");
 
-  // TODO: Will be implemented in Phase 5
-  // For now, show empty state
-  const history = []; // getHistory() from localStorageService
+  // Get history from localStorage
+  const history = getHistory();
 
-  if (history.length === 0) {
+  // Sort by generatedAt (newest first)
+  const sortedHistory = history.sort(
+    (a, b) => new Date(b.generatedAt) - new Date(a.generatedAt)
+  );
+
+  if (sortedHistory.length === 0) {
     renderEmptyState(container);
   } else {
-    renderHistoryList(container, history);
+    renderHistoryList(container, sortedHistory);
   }
+
+  console.log(`[HistoryView] Loaded ${sortedHistory.length} history items`);
 }
 
 /**
@@ -123,8 +135,8 @@ function renderHistoryList(container, history) {
               Dibuat: ${new Date(item.generatedAt).toLocaleString("id-ID")}
             </p>
             ${
-              item.cvData.namaLengkap
-                ? `<p class="mb-1"><strong>Nama:</strong> ${item.cvData.namaLengkap}</p>`
+              item.sourceData && item.sourceData.namaLengkap
+                ? `<p class="mb-1"><strong>Nama:</strong> ${item.sourceData.namaLengkap}</p>`
                 : ""
             }
           </div>
@@ -158,6 +170,130 @@ function renderHistoryList(container, history) {
 }
 
 /**
+ * Handle view history button click
+ * @param {string} historyId - History ID to view
+ */
+function handleViewHistory(historyId) {
+  const item = getHistoryById(historyId);
+
+  if (!item) {
+    showToast("Riwayat tidak ditemukan", "error");
+    return;
+  }
+
+  // Get modal elements
+  const modal = document.getElementById("modalViewHistory");
+  const modalContent = document.getElementById("modal-cv-content");
+
+  if (!modal || !modalContent) return;
+
+  // Display CV text in modal
+  modalContent.textContent = item.cvTextContent;
+
+  // Store current history ID for copy button
+  modal.dataset.currentHistoryId = historyId;
+
+  // Show modal using Bootstrap
+  const bsModal = new bootstrap.Modal(modal);
+  bsModal.show();
+
+  console.log("[HistoryView] Viewing history:", historyId);
+}
+
+/**
+ * Handle copy history button click (direct copy without modal)
+ * @param {string} historyId - History ID to copy
+ */
+async function handleCopyHistory(historyId) {
+  const item = getHistoryById(historyId);
+
+  if (!item) {
+    showToast("Riwayat tidak ditemukan", "error");
+    return;
+  }
+
+  try {
+    // Try Clipboard API
+    await navigator.clipboard.writeText(item.cvTextContent);
+    showToast("CV berhasil disalin ke clipboard!", "success");
+    console.log("[HistoryView] CV copied from history:", historyId);
+  } catch (error) {
+    // Fallback to execCommand
+    console.warn("[HistoryView] Clipboard API failed, trying fallback:", error);
+
+    const textarea = document.createElement("textarea");
+    textarea.value = item.cvTextContent;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+
+    try {
+      document.execCommand("copy");
+      showToast("CV berhasil disalin ke clipboard!", "success");
+      console.log("[HistoryView] CV copied via execCommand");
+    } catch (fallbackError) {
+      console.error("[HistoryView] All copy methods failed:", fallbackError);
+      showToast(
+        "Gagal menyalin. Silakan gunakan tombol View lalu copy manual.",
+        "error"
+      );
+    }
+
+    document.body.removeChild(textarea);
+  }
+}
+
+/**
+ * Handle delete history button click
+ * @param {string} historyId - History ID to delete
+ */
+function handleDeleteHistory(historyId) {
+  const item = getHistoryById(historyId);
+
+  if (!item) {
+    showToast("Riwayat tidak ditemukan", "error");
+    return;
+  }
+
+  // Double confirmation
+  const confirmMessage = `Apakah Anda yakin ingin menghapus CV "${item.name}"?\n\nTindakan ini tidak dapat dibatalkan.`;
+
+  if (!confirm(confirmMessage)) {
+    return;
+  }
+
+  // Delete history
+  const result = deleteHistory(historyId);
+
+  if (result.success) {
+    showToast("Riwayat CV berhasil dihapus", "success");
+    console.log("[HistoryView] Deleted history:", historyId);
+
+    // Reload history list
+    loadHistory();
+  } else {
+    showToast(result.message || "Gagal menghapus riwayat", "error");
+    console.error("[HistoryView] Delete failed:", result);
+  }
+}
+
+/**
+ * Handle modal copy button click
+ */
+async function handleModalCopy() {
+  const modal = document.getElementById("modalViewHistory");
+  const historyId = modal?.dataset.currentHistoryId;
+
+  if (!historyId) {
+    showToast("ID riwayat tidak ditemukan", "error");
+    return;
+  }
+
+  await handleCopyHistory(historyId);
+}
+
+/**
  * Attach event listeners for history actions
  */
 function attachHistoryListeners() {
@@ -166,20 +302,16 @@ function attachHistoryListeners() {
   viewButtons.forEach((button) => {
     button.addEventListener("click", (e) => {
       const historyId = e.currentTarget.getAttribute("data-id");
-      console.log("[HistoryView] View history:", historyId);
-      // TODO: Implement view history functionality in Phase 5
-      alert("Fitur View History akan diimplementasikan di Phase 5");
+      handleViewHistory(historyId);
     });
   });
 
   // Copy history buttons
   const copyButtons = document.querySelectorAll(".btn-copy-history");
   copyButtons.forEach((button) => {
-    button.addEventListener("click", async (e) => {
+    button.addEventListener("click", (e) => {
       const historyId = e.currentTarget.getAttribute("data-id");
-      console.log("[HistoryView] Copy history:", historyId);
-      // TODO: Implement copy history functionality in Phase 5
-      alert("Fitur Copy History akan diimplementasikan di Phase 5");
+      handleCopyHistory(historyId);
     });
   });
 
@@ -188,13 +320,15 @@ function attachHistoryListeners() {
   deleteButtons.forEach((button) => {
     button.addEventListener("click", (e) => {
       const historyId = e.currentTarget.getAttribute("data-id");
-      if (confirm("Apakah Anda yakin ingin menghapus riwayat CV ini?")) {
-        console.log("[HistoryView] Delete history:", historyId);
-        // TODO: Implement delete history functionality in Phase 5
-        alert("Fitur Delete History akan diimplementasikan di Phase 5");
-      }
+      handleDeleteHistory(historyId);
     });
   });
+
+  // Modal copy button
+  const btnModalCopy = document.getElementById("btn-modal-copy");
+  if (btnModalCopy) {
+    btnModalCopy.addEventListener("click", handleModalCopy);
+  }
 }
 
 /**

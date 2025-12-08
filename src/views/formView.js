@@ -1288,6 +1288,25 @@ function handleResetForm() {
  */
 function initFormView() {
   renderFormView();
+
+  // Check if there's a draft to load from sessionStorage
+  const draftToLoad = sessionStorage.getItem("taaruf_cv_draft_to_load");
+  if (draftToLoad) {
+    try {
+      const draftData = JSON.parse(draftToLoad);
+
+      // Wait for form to be fully rendered before loading
+      setTimeout(() => {
+        loadDraftToForm(draftData);
+        // Clear sessionStorage after loading
+        sessionStorage.removeItem("taaruf_cv_draft_to_load");
+      }, 100);
+    } catch (error) {
+      console.error("[FormView] Error loading draft:", error);
+      showToast("Gagal memuat draft", "error");
+    }
+  }
+
   console.log("[FormView] Form view initialized");
 }
 
@@ -1298,4 +1317,4 @@ window.addEventListener("viewChanged", (e) => {
   }
 });
 
-export { renderFormView, initFormView };
+export { renderFormView, initFormView, loadDraftToForm };
