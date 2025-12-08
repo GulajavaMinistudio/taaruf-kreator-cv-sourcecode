@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Aplikasi pembuat CV Ta'aruf untuk Muslim dan Muslimah"
+    />
+    <title>Taaruf CV Kreator</title>
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+  </head>
+  <body>
+    <!-- Navigation Bar (Fixed Top) -->
+    <nav
+      id="main-navbar"
+      class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm"
+    >
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="#/">
+          <i class="bi bi-file-earmark-person text-primary"></i>
+          Taaruf CV Kreator
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#/">
+                <i class="bi bi-house"></i> Beranda
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#/form">
+                <i class="bi bi-pencil-square"></i> Buat CV
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#/draft">
+                <i class="bi bi-file-earmark-text"></i> Draft
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#/history">
+                <i class="bi bi-clock-history"></i> Riwayat
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#/doa">
+                <i class="bi bi-book"></i> Doa & Hadits
+              </a>
+            </li>
+          </ul>
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="#/settings" title="Pengaturan">
+                <i class="bi bi-gear"></i> Pengaturan
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main
+      id="app-container"
+      class="container py-4"
+      style="margin-top: 70px; min-height: calc(100vh - 140px)"
+    >
+      <!-- Landing Page View -->
+      <div id="view-landing" class="view-section">
+        <!-- Content will be injected by landingView.js -->
+      </div>
+
+      <!-- Form Page View -->
+      <div id="view-form" class="view-section d-none">
+        <!-- Content will be injected by formView.js -->
+      </div>
+
+      <!-- Preview Page View -->
+      <div id="view-preview" class="view-section d-none">
+        <!-- Content will be injected by previewView.js -->
+      </div>
+
+      <!-- Result Page View -->
+      <div id="view-result" class="view-section d-none">
+        <!-- Content will be injected by resultView.js -->
+      </div>
+
+      <!-- Draft Page View -->
+      <div id="view-draft" class="view-section d-none">
+        <!-- Content will be injected by draftView.js -->
+      </div>
+
+      <!-- History Page View -->
+      <div id="view-history" class="view-section d-none">
+        <!-- Content will be injected by historyView.js -->
+      </div>
+
+      <!-- Doa & Hadits Page View -->
+      <div id="view-doa" class="view-section d-none">
+        <!-- Content will be injected by doaView.js -->
+      </div>
+
+      <!-- Settings Page View -->
+      <div id="view-settings" class="view-section d-none">
+        <!-- Content will be injected by settingsView.js -->
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="main-footer" class="footer mt-auto py-3 bg-light border-top">
+      <div class="container text-center">
+        <span class="text-muted"
+          >© 2025 Gulajava Ministudio | Taaruf CV Kreator v1.5</span
+        >
+      </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div
+      class="toast-container position-fixed bottom-0 end-0 p-3"
+      id="toast-container"
+    >
+      <!-- Toasts will be injected here -->
+    </div>
+
+    <!-- Modal Container -->
+    <div id="modal-container">
+      <!-- Modals will be injected here -->
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,298 @@
+/**
+ * @file resultView.js
+ * @description Result Page View - Display generated CV
+ * @version 2.0
+ * @date 2025-12-08
+ */
+
+import { navigateTo } from "../router/router.js";
+import { showToast } from "../components/ToastNotification.js";
+import { saveHistory } from "../services/localStorageService.js";
+
+/**
+ * Render Result Page content
+ */
+function renderResultView() {
+  const container = document.getElementById("view-result");
+
+  // Load generated CV text from sessionStorage
+  const cvText = sessionStorage.getItem("taaruf_cv_generated_text");
+
+  // If no CV text, redirect to form
+  if (!cvText) {
+    showToast(
+      "Tidak ada CV yang di-generate. Silakan isi formulir terlebih dahulu.",
+      "warning"
+    );
+    navigateTo("/form");
+    return;
+  }
+
+  // Count characters
+  const charCount = cvText.length.toLocaleString("id-ID");
+
+  container.innerHTML = `
+    <!-- Success Alert -->
+    <div class="alert alert-success" role="alert">
+      <h4 class="alert-heading">
+        <i class="bi bi-check-circle"></i> CV Ta'aruf Berhasil Dibuat!
+      </h4>
+      <p class="mb-0">
+        CV Anda telah berhasil di-generate. Anda dapat menyalin teks di bawah 
+        atau menyimpannya ke riwayat untuk diakses nanti.
+      </p>
+    </div>
+
+    <!-- Output Area -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+          <i class="bi bi-file-earmark-text"></i> CV Ta'aruf Anda
+        </h5>
+        <span class="badge bg-secondary">${charCount} karakter</span>
+      </div>
+      <div class="card-body">
+        <textarea 
+          id="cv-output" 
+          class="form-control cv-preview" 
+          rows="25" 
+          readonly
+          style="font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6;"
+        >${cvText}</textarea>
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <div class="d-flex justify-content-between flex-wrap gap-2">
+        <div class="d-flex gap-2 flex-wrap">
+          <button type="button" class="btn btn-primary" id="btn-copy-cv">
+            <i class="bi bi-clipboard"></i> Copy to Clipboard
+          </button>
+          <button type="button" class="btn btn-success" id="btn-save-history">
+            <i class="bi bi-save"></i> Simpan ke History
+          </button>
+          <button type="button" class="btn btn-outline-info" id="btn-print-cv">
+            <i class="bi bi-printer"></i> Print
+          </button>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <button type="button" class="btn btn-outline-secondary" id="btn-new-cv">
+            <i class="bi bi-plus-circle"></i> Buat CV Baru
+          </button>
+          <button type="button" class="btn btn-outline-primary" id="btn-back-home">
+            <i class="bi bi-house"></i> Kembali ke Beranda
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spacing for sticky action bar -->
+    <div style="height: 80px;"></div>
+  `;
+
+  // Attach event listeners
+  attachEventListeners();
+}
+
+/**
+ * Handle copy to clipboard with fallback
+ */
+async function handleCopyToClipboard() {
+  const cvOutput = document.getElementById("cv-output");
+  const btnCopy = document.getElementById("btn-copy-cv");
+
+  if (!cvOutput) return;
+
+  try {
+    // Try modern Clipboard API first
+    await navigator.clipboard.writeText(cvOutput.value);
+
+    // Show success feedback
+    showToast("CV berhasil disalin ke clipboard!", "success");
+
+    const originalText = btnCopy.innerHTML;
+    btnCopy.innerHTML = '<i class="bi bi-check"></i> Tersalin!';
+    btnCopy.classList.add("btn-success");
+    btnCopy.classList.remove("btn-primary");
+
+    setTimeout(() => {
+      btnCopy.innerHTML = originalText;
+      btnCopy.classList.remove("btn-success");
+      btnCopy.classList.add("btn-primary");
+    }, 2000);
+
+    console.log("[ResultView] CV copied to clipboard via Clipboard API");
+  } catch (err) {
+    // Fallback to execCommand for older browsers
+    console.warn("[ResultView] Clipboard API failed, trying execCommand:", err);
+    try {
+      cvOutput.select();
+      document.execCommand("copy");
+      showToast("CV berhasil disalin ke clipboard!", "success");
+      console.log("[ResultView] CV copied via execCommand");
+    } catch (fallbackErr) {
+      console.error("[ResultView] All copy methods failed:", fallbackErr);
+      showToast("Gagal menyalin. Silakan gunakan Ctrl+A dan Ctrl+C.", "error");
+    }
+  }
+}
+
+/**
+ * Handle save to history
+ */
+function handleSaveHistory() {
+  const cvText = sessionStorage.getItem("taaruf_cv_generated_text");
+  const sourceDataStr = sessionStorage.getItem("taaruf_cv_source_data");
+
+  if (!cvText || !sourceDataStr) {
+    showToast(
+      "Data CV tidak ditemukan. Tidak dapat menyimpan ke history.",
+      "error"
+    );
+    return;
+  }
+
+  try {
+    const sourceData = JSON.parse(sourceDataStr);
+
+    // Create history object
+    const historyItem = {
+      id: `cv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      name: sourceData.namaLengkap || "CV Ta'aruf",
+      generatedAt: new Date().toISOString(),
+      cvTextContent: cvText,
+      sourceData: sourceData,
+    };
+
+    // Save to localStorage
+    saveHistory(historyItem);
+
+    showToast("CV berhasil disimpan ke history!", "success");
+    console.log("[ResultView] CV saved to history:", historyItem.id);
+
+    // Disable button after saving
+    const btnSave = document.getElementById("btn-save-history");
+    if (btnSave) {
+      btnSave.disabled = true;
+      btnSave.innerHTML = '<i class="bi bi-check-circle"></i> Sudah Disimpan';
+    }
+  } catch (err) {
+    console.error("[ResultView] Failed to save history:", err);
+    showToast("Gagal menyimpan ke history. Silakan coba lagi.", "error");
+  }
+}
+
+/**
+ * Handle print CV
+ */
+function handlePrintCV() {
+  const cvText = sessionStorage.getItem("taaruf_cv_generated_text");
+
+  if (!cvText) {
+    showToast("Tidak ada CV untuk dicetak.", "error");
+    return;
+  }
+
+  // Create a new window for printing
+  const printWindow = window.open("", "_blank");
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>CV Ta'aruf - Print</title>
+      <style>
+        body {
+          font-family: 'Courier New', monospace;
+          font-size: 12pt;
+          line-height: 1.6;
+          margin: 2cm;
+          white-space: pre-wrap;
+        }
+        @media print {
+          body { margin: 1cm; }
+        }
+      </style>
+    </head>
+    <body>${cvText}</body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+
+  // Wait for content to load, then print
+  setTimeout(() => {
+    printWindow.print();
+  }, 250);
+
+  console.log("[ResultView] Print dialog opened");
+}
+
+/**
+ * Handle new CV creation
+ */
+function handleNewCV() {
+  // Clear sessionStorage
+  sessionStorage.removeItem("taaruf_cv_temp_data");
+  sessionStorage.removeItem("taaruf_cv_generated_text");
+  sessionStorage.removeItem("taaruf_cv_source_data");
+
+  // Navigate to form
+  showToast("Membuat CV baru. Silakan isi formulir.", "info");
+  navigateTo("/form");
+  console.log("[ResultView] Starting new CV, sessionStorage cleared");
+}
+
+/**
+ * Attach event listeners for result page interactions
+ */
+function attachEventListeners() {
+  const btnCopy = document.getElementById("btn-copy-cv");
+  const btnSaveHistory = document.getElementById("btn-save-history");
+  const btnPrint = document.getElementById("btn-print-cv");
+  const btnNewCV = document.getElementById("btn-new-cv");
+  const btnBackHome = document.getElementById("btn-back-home");
+
+  // Copy to clipboard button
+  if (btnCopy) {
+    btnCopy.addEventListener("click", handleCopyToClipboard);
+  }
+
+  // Save to history button
+  if (btnSaveHistory) {
+    btnSaveHistory.addEventListener("click", handleSaveHistory);
+  }
+
+  // Print button
+  if (btnPrint) {
+    btnPrint.addEventListener("click", handlePrintCV);
+  }
+
+  // New CV button
+  if (btnNewCV) {
+    btnNewCV.addEventListener("click", handleNewCV);
+  }
+
+  // Back to home button
+  if (btnBackHome) {
+    btnBackHome.addEventListener("click", () => {
+      navigateTo("/");
+    });
+  }
+}
+
+/**
+ * Initialize result view when view is activated
+ */
+function initResultView() {
+  renderResultView();
+}
+
+// Listen for view change event
+window.addEventListener("viewChanged", (e) => {
+  if (e.detail.viewId === "view-result") {
+    initResultView();
+  }
+});
+
+export { renderResultView, initResultView };
