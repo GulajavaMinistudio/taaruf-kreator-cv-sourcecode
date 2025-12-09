@@ -1,14 +1,17 @@
 /**
  * @file formView.js
  * @description Form Page View - CV Input Form with Validation
- * @version 2.1
+ * @version 2.2
  * @date 2025-01-27
+ * @changelog
+ * - v2.2 (2025-01-27): Integrated real-time validation on blur (AC-VAL-001, AC-VAL-002)
  */
 
 import {
   validateField,
   clearFieldError,
   validateForm,
+  initializeRealTimeValidation,
 } from "../services/validationService.js";
 import { saveDraft } from "../services/localStorageService.js";
 import { showToast } from "../components/ToastNotification.js";
@@ -1304,6 +1307,12 @@ function handleResetForm() {
 function initFormView() {
   renderFormView();
 
+  // Initialize real-time validation on blur (AC-VAL-001, AC-VAL-002)
+  const form = document.getElementById("cv-form");
+  if (form) {
+    initializeRealTimeValidation(form);
+  }
+
   // Check if there's a draft to load from sessionStorage
   const draftToLoad = sessionStorage.getItem("taaruf_cv_draft_to_load");
   if (draftToLoad) {
@@ -1322,7 +1331,7 @@ function initFormView() {
     }
   }
 
-  console.log("[FormView] Form view initialized");
+  console.log("[FormView] Form view initialized with real-time validation");
 }
 
 // Listen for view change event

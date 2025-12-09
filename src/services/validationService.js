@@ -1,8 +1,10 @@
 /**
  * @file validationService.js
  * @description Form validation service with rules and error messages
- * @version 1.0
- * @date 2025-12-08
+ * @version 1.1
+ * @date 2025-01-27
+ * @changelog
+ * - v1.1 (2025-01-27): Added real-time validation on blur (AC-VAL-001, AC-VAL-002)
  */
 
 /**
@@ -300,4 +302,78 @@ export function clearFieldError(field) {
 export function clearAllValidation(formElement) {
   const fields = formElement.querySelectorAll("input, select, textarea");
   fields.forEach((field) => clearFieldError(field));
+}
+
+/**
+ * Initialize real-time validation for form fields
+ * Adds blur event listeners to validate fields on focus out
+ * Implements AC-VAL-001 and AC-VAL-002 requirements
+ * @param {HTMLFormElement} formElement - Form element
+ */
+export function initializeRealTimeValidation(formElement) {
+  const fields = formElement.querySelectorAll("input, select, textarea");
+
+  fields.forEach((field) => {
+    // Skip optional fields that are empty (don't show green border for empty optional)
+    field.addEventListener("blur", () => {
+      // Only validate if field is required OR has value
+      const isRequired = field.hasAttribute("required");
+      const hasValue = field.value.trim() !== "";
+
+      if (isRequired || hasValue) {
+        // Check if field is valid
+        const isValid = field.checkValidity();
+
+        if (isValid) {
+          // AC-VAL-002: Show green border for valid required field
+          showFieldValid(field);
+        } else {
+          // AC-VAL-001: Show red border and error message for invalid field
+          const feedbackDiv = field.nextElementSibling;
+          const errorMessage =
+            feedbackDiv && feedbackDiv.classList.contains("invalid-feedback")
+              ? feedbackDiv.textContent
+              : ERROR_MESSAGES.REQUIRED;
+          showFieldError(field, errorMessage);
+        }
+      } else {
+        // Optional field, empty - clear any validation state
+        clearFieldError(field);
+      }
+    });
+
+    // Also validate on input for better UX (remove error as user types)
+    field.addEventListener("input", () => {
+      // Only re-validate if field already has validation state
+      if (
+        field.classList.contains("is-invalid") ||
+        field.classList.contains("is-valid")
+      ) {
+        const isRequired = field.hasAttribute("required");
+        const hasValue = field.value.trim() !== "";
+
+        if (isRequired || hasValue) {
+          const isValid = field.checkValidity();
+          if (isValid) {
+            showFieldValid(field);
+          } else {
+            const feedbackDiv = field.nextElementSibling;
+            const errorMessage =
+              feedbackDiv && feedbackDiv.classList.contains("invalid-feedback")
+                ? feedbackDiv.textContent
+                : ERROR_MESSAGES.REQUIRED;
+            showFieldError(field, errorMessage);
+          }
+        } else {
+          clearFieldError(field);
+        }
+      }
+    });
+  });
+
+  console.log(
+    "[ValidationService] Real-time validation initialized for",
+    fields.length,
+    "fields"
+  );
 }
