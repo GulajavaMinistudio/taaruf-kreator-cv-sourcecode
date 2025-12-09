@@ -1,12 +1,16 @@
 /**
  * @file settingsView.js
  * @description Settings Page View - App settings and information
- * @version 2.0
+ * @version 2.1
  * @date 2025-01-27
  */
 
 import { clearAllData } from "../services/localStorageService.js";
 import { showToast } from "../components/ToastNotification.js";
+import {
+  setButtonLoading,
+  resetButtonLoading,
+} from "../components/LoadingSpinner.js";
 
 /**
  * Render Settings Page content
@@ -188,22 +192,29 @@ function attachEventListeners() {
         if (doubleConfirm) {
           console.log("[SettingsView] Clearing all data...");
 
-          const result = clearAllData();
+          // Show loading state
+          setButtonLoading(btnReset, "Menghapus...");
 
-          if (result.success) {
-            showToast(
-              "Semua data berhasil dihapus. Halaman akan dimuat ulang...",
-              "success"
-            );
+          // Simulate async operation
+          setTimeout(() => {
+            const result = clearAllData();
 
-            // Reload page after 1.5 seconds to show toast
-            setTimeout(() => {
-              window.location.reload();
-            }, 1500);
-          } else {
-            showToast(result.message || "Gagal menghapus data", "error");
-            console.error("[SettingsView] Clear data failed:", result.error);
-          }
+            if (result.success) {
+              showToast(
+                "Semua data berhasil dihapus. Halaman akan dimuat ulang...",
+                "success"
+              );
+
+              // Reload page after 1.5 seconds to show toast
+              setTimeout(() => {
+                window.location.reload();
+              }, 1500);
+            } else {
+              resetButtonLoading(btnReset);
+              showToast(result.message || "Gagal menghapus data", "error");
+              console.error("[SettingsView] Clear data failed:", result.error);
+            }
+          }, 500);
         }
       }
     });

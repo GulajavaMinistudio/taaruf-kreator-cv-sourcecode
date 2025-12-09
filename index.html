@@ -17,14 +17,26 @@
     />
   </head>
   <body>
+    <!-- Skip to Content Link for Accessibility -->
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
     <!-- Navigation Bar (Fixed Top) -->
     <nav
       id="main-navbar"
       class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm"
+      role="navigation"
+      aria-label="Main navigation"
     >
       <div class="container">
-        <a class="navbar-brand fw-bold" href="#/">
-          <i class="bi bi-file-earmark-person text-primary"></i>
+        <a
+          class="navbar-brand fw-bold"
+          href="#/"
+          aria-label="Taaruf CV Kreator Homepage"
+        >
+          <i
+            class="bi bi-file-earmark-person text-primary"
+            aria-hidden="true"
+          ></i>
           Taaruf CV Kreator
         </a>
         <button
@@ -39,37 +51,67 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="#/">
-                <i class="bi bi-house"></i> Beranda
+          <ul class="navbar-nav me-auto" role="menubar">
+            <li class="nav-item" role="none">
+              <a
+                class="nav-link"
+                href="#/"
+                role="menuitem"
+                aria-label="Beranda"
+              >
+                <i class="bi bi-house" aria-hidden="true"></i> Beranda
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#/form">
-                <i class="bi bi-pencil-square"></i> Buat CV
+            <li class="nav-item" role="none">
+              <a
+                class="nav-link"
+                href="#/form"
+                role="menuitem"
+                aria-label="Buat CV Baru"
+              >
+                <i class="bi bi-pencil-square" aria-hidden="true"></i> Buat CV
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#/draft">
-                <i class="bi bi-file-earmark-text"></i> Draft
+            <li class="nav-item" role="none">
+              <a
+                class="nav-link"
+                href="#/draft"
+                role="menuitem"
+                aria-label="Lihat Draft"
+              >
+                <i class="bi bi-file-earmark-text" aria-hidden="true"></i> Draft
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#/history">
-                <i class="bi bi-clock-history"></i> Riwayat
+            <li class="nav-item" role="none">
+              <a
+                class="nav-link"
+                href="#/history"
+                role="menuitem"
+                aria-label="Lihat Riwayat CV"
+              >
+                <i class="bi bi-clock-history" aria-hidden="true"></i> Riwayat
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#/doa">
-                <i class="bi bi-book"></i> Doa & Hadits
+            <li class="nav-item" role="none">
+              <a
+                class="nav-link"
+                href="#/doa"
+                role="menuitem"
+                aria-label="Doa dan Hadits"
+              >
+                <i class="bi bi-book" aria-hidden="true"></i> Doa & Hadits
               </a>
             </li>
           </ul>
           <ul class="navbar-nav">
-            <li class="nav-item">
-              <a class="nav-link" href="#/settings" title="Pengaturan">
-                <i class="bi bi-gear"></i> Pengaturan
+            <li class="nav-item" role="none">
+              <a
+                class="nav-link"
+                href="#/settings"
+                role="menuitem"
+                aria-label="Pengaturan Aplikasi"
+              >
+                <i class="bi bi-gear" aria-hidden="true"></i> Pengaturan
               </a>
             </li>
           </ul>
@@ -79,9 +121,11 @@
 
     <!-- Main Content Container -->
     <main
-      id="app-container"
+      id="main-content"
       class="container py-4"
       style="margin-top: 70px; min-height: calc(100vh - 140px)"
+      role="main"
+      aria-label="Main content area"
     >
       <!-- Landing Page View -->
       <div id="view-landing" class="view-section">
@@ -125,7 +169,11 @@
     </main>
 
     <!-- Footer -->
-    <footer id="main-footer" class="footer mt-auto py-3 bg-light border-top">
+    <footer
+      id="main-footer"
+      class="footer mt-auto py-3 bg-light border-top"
+      role="contentinfo"
+    >
       <div class="container text-center">
         <span class="text-muted"
           >© 2025 Gulajava Ministudio | Taaruf CV Kreator v1.5</span
@@ -137,12 +185,15 @@
     <div
       class="toast-container position-fixed bottom-0 end-0 p-3"
       id="toast-container"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
     >
       <!-- Toasts will be injected here -->
     </div>
 
     <!-- Modal Container -->
-    <div id="modal-container">
+    <div id="modal-container" role="dialog" aria-modal="true">
       <!-- Modals will be injected here -->
     </div>
 

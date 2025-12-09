@@ -1,8 +1,8 @@
 /**
  * @file formView.js
  * @description Form Page View - CV Input Form with Validation
- * @version 2.0
- * @date 2025-12-08
+ * @version 2.1
+ * @date 2025-01-27
  */
 
 import {
@@ -13,6 +13,10 @@ import {
 import { saveDraft } from "../services/localStorageService.js";
 import { showToast } from "../components/ToastNotification.js";
 import { navigateTo } from "../router/router.js";
+import {
+  setButtonLoading,
+  resetButtonLoading,
+} from "../components/LoadingSpinner.js";
 
 /**
  * Render Form Page content (skeleton structure)
@@ -1167,6 +1171,8 @@ function collectFormData() {
  * Handle save draft button click
  */
 function handleSaveDraft() {
+  const btnSave = document.getElementById("btn-save-draft");
+
   const formData = collectFormData();
 
   // Check if at least some data is filled
@@ -1177,19 +1183,28 @@ function handleSaveDraft() {
     return;
   }
 
-  // Save to localStorage
-  const result = saveDraft(formData);
+  // Show loading state
+  setButtonLoading(btnSave, "Menyimpan...");
 
-  if (result.success) {
-    showToast(
-      "Draft berhasil disimpan! Anda dapat melanjutkan nanti.",
-      "success"
-    );
-    console.log("[FormView] Draft saved with ID:", result.data?.id);
-  } else {
-    showToast(result.message || "Gagal menyimpan draft", "error");
-    console.error("[FormView] Save draft failed:", result);
-  }
+  // Simulate async operation with setTimeout
+  setTimeout(() => {
+    // Save to localStorage
+    const result = saveDraft(formData);
+
+    // Reset button state
+    resetButtonLoading(btnSave);
+
+    if (result.success) {
+      showToast(
+        "Draft berhasil disimpan! Anda dapat melanjutkan nanti.",
+        "success"
+      );
+      console.log("[FormView] Draft saved with ID:", result.data?.id);
+    } else {
+      showToast(result.message || "Gagal menyimpan draft", "error");
+      console.error("[FormView] Save draft failed:", result);
+    }
+  }, 500);
 }
 
 /**
@@ -1317,4 +1332,4 @@ window.addEventListener("viewChanged", (e) => {
   }
 });
 
-export { renderFormView, initFormView, loadDraftToForm };
+export { renderFormView, initFormView };

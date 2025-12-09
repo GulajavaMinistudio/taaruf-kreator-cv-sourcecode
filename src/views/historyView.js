@@ -1,7 +1,7 @@
 /**
  * @file historyView.js
  * @description History Page View - View generated CV history
- * @version 2.0
+ * @version 2.1
  * @date 2025-01-27
  */
 
@@ -12,6 +12,10 @@ import {
   deleteHistory,
 } from "../services/localStorageService.js";
 import { showToast } from "../components/ToastNotification.js";
+import {
+  setButtonLoading,
+  resetButtonLoading,
+} from "../components/LoadingSpinner.js";
 
 /**
  * Render History Page content
@@ -143,17 +147,17 @@ function renderHistoryList(container, history) {
           <div class="d-flex gap-2">
             <button class="btn btn-sm btn-info btn-view-history" data-id="${
               item.id
-            }">
+            }" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat CV dalam modal">
               <i class="bi bi-eye"></i> Lihat
             </button>
             <button class="btn btn-sm btn-primary btn-copy-history" data-id="${
               item.id
-            }">
+            }" data-bs-toggle="tooltip" data-bs-placement="top" title="Salin CV ke clipboard">
               <i class="bi bi-clipboard"></i> Copy
             </button>
             <button class="btn btn-sm btn-danger btn-delete-history" data-id="${
               item.id
-            }">
+            }" data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus riwayat ini secara permanen">
               <i class="bi bi-trash"></i> Hapus
             </button>
           </div>
@@ -167,6 +171,14 @@ function renderHistoryList(container, history) {
 
   // Attach event listeners
   attachHistoryListeners();
+
+  // Initialize Bootstrap tooltips
+  const tooltipTriggerList = [].slice.call(
+    container.querySelectorAll('[data-bs-toggle="tooltip"]')
+  );
+  tooltipTriggerList.forEach((tooltipTriggerEl) => {
+    new bootstrap.Tooltip(tooltipTriggerEl);
+  });
 }
 
 /**
@@ -203,8 +215,10 @@ function handleViewHistory(historyId) {
 /**
  * Handle copy history button click (direct copy without modal)
  * @param {string} historyId - History ID to copy
+ * @param {Event} event - Click event
  */
-async function handleCopyHistory(historyId) {
+async function handleCopyHistory(historyId, event) {
+  const button = event?.currentTarget;
   const item = getHistoryById(historyId);
 
   if (!item) {
@@ -212,9 +226,14 @@ async function handleCopyHistory(historyId) {
     return;
   }
 
+  // Show loading state
+  if (button) setButtonLoading(button, "Menyalin...");
+
   try {
     // Try Clipboard API
     await navigator.clipboard.writeText(item.cvTextContent);
+
+    if (button) resetButtonLoading(button);
     showToast("CV berhasil disalin ke clipboard!", "success");
     console.log("[HistoryView] CV copied from history:", historyId);
   } catch (error) {
@@ -230,10 +249,12 @@ async function handleCopyHistory(historyId) {
 
     try {
       document.execCommand("copy");
+      if (button) resetButtonLoading(button);
       showToast("CV berhasil disalin ke clipboard!", "success");
       console.log("[HistoryView] CV copied via execCommand");
     } catch (fallbackError) {
       console.error("[HistoryView] All copy methods failed:", fallbackError);
+      if (button) resetButtonLoading(button);
       showToast(
         "Gagal menyalin. Silakan gunakan tombol View lalu copy manual.",
         "error"
@@ -247,8 +268,10 @@ async function handleCopyHistory(historyId) {
 /**
  * Handle delete history button click
  * @param {string} historyId - History ID to delete
+ * @param {Event} event - Click event
  */
-function handleDeleteHistory(historyId) {
+function handleDeleteHistory(historyId, event) {
+  const button = event?.currentTarget;
   const item = getHistoryById(historyId);
 
   if (!item) {
@@ -263,19 +286,27 @@ function handleDeleteHistory(historyId) {
     return;
   }
 
-  // Delete history
-  const result = deleteHistory(historyId);
+  // Show loading state
+  if (button) setButtonLoading(button, "Menghapus...");
 
-  if (result.success) {
-    showToast("Riwayat CV berhasil dihapus", "success");
-    console.log("[HistoryView] Deleted history:", historyId);
+  // Simulate async operation with delay
+  setTimeout(() => {
+    // Delete history
+    const result = deleteHistory(historyId);
 
-    // Reload history list
-    loadHistory();
-  } else {
-    showToast(result.message || "Gagal menghapus riwayat", "error");
-    console.error("[HistoryView] Delete failed:", result);
-  }
+    if (button) resetButtonLoading(button);
+
+    if (result.success) {
+      showToast("Riwayat CV berhasil dihapus", "success");
+      console.log("[HistoryView] Deleted history:", historyId);
+
+      // Reload history list
+      loadHistory();
+    } else {
+      showToast(result.message || "Gagal menghapus riwayat", "error");
+      console.error("[HistoryView] Delete failed:", result);
+    }
+  }, 300);
 }
 
 /**
@@ -311,7 +342,7 @@ function attachHistoryListeners() {
   copyButtons.forEach((button) => {
     button.addEventListener("click", (e) => {
       const historyId = e.currentTarget.getAttribute("data-id");
-      handleCopyHistory(historyId);
+      handleCopyHistory(historyId, e);
     });
   });
 
@@ -320,7 +351,7 @@ function attachHistoryListeners() {
   deleteButtons.forEach((button) => {
     button.addEventListener("click", (e) => {
       const historyId = e.currentTarget.getAttribute("data-id");
-      handleDeleteHistory(historyId);
+      handleDeleteHistory(historyId, e);
     });
   });
 

@@ -1,7 +1,7 @@
 /**
  * @file draftView.js
  * @description Draft Page View - Manage saved drafts
- * @version 2.0
+ * @version 2.2
  * @date 2025-01-27
  */
 
@@ -12,7 +12,10 @@ import {
   deleteDraft,
 } from "../services/localStorageService.js";
 import { showToast } from "../components/ToastNotification.js";
-import { loadDraftToForm } from "./formView.js";
+import {
+  setButtonLoading,
+  resetButtonLoading,
+} from "../components/LoadingSpinner.js";
 
 /**
  * Render Draft Page content
@@ -124,12 +127,12 @@ function renderDraftList(container, drafts) {
           <div class="d-flex gap-2">
             <button class="btn btn-sm btn-primary btn-load-draft" data-id="${
               draft.id
-            }">
+            }" data-bs-toggle="tooltip" data-bs-placement="top" title="Muat draft ini ke formulir">
               <i class="bi bi-arrow-right-circle"></i> Load
             </button>
             <button class="btn btn-sm btn-danger btn-delete-draft" data-id="${
               draft.id
-            }">
+            }" data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus draft ini secara permanen">
               <i class="bi bi-trash"></i> Hapus
             </button>
           </div>
@@ -143,13 +146,22 @@ function renderDraftList(container, drafts) {
 
   // Attach event listeners
   attachDraftListeners();
+
+  // Initialize Bootstrap tooltips
+  const tooltipTriggerList = [].slice.call(
+    container.querySelectorAll('[data-bs-toggle="tooltip"]')
+  );
+  tooltipTriggerList.forEach((tooltipTriggerEl) => {
+    new bootstrap.Tooltip(tooltipTriggerEl);
+  });
 }
 
 /**
  * Handle load draft button click
  * @param {string} draftId - Draft ID to load
  */
-function handleLoadDraft(draftId) {
+function handleLoadDraft(draftId, event) {
+  const button = event?.target;
   const draft = getDraftById(draftId);
 
   if (!draft) {
@@ -157,14 +169,23 @@ function handleLoadDraft(draftId) {
     return;
   }
 
-  // Store draft data in sessionStorage for form to load
-  sessionStorage.setItem("taaruf_cv_draft_to_load", JSON.stringify(draft.data));
+  // Show loading state
+  if (button) setButtonLoading(button, "Memuat...");
 
-  // Navigate to form
-  navigateTo("/form");
+  // Simulate async operation
+  setTimeout(() => {
+    // Store draft data in sessionStorage for form to load
+    sessionStorage.setItem(
+      "taaruf_cv_draft_to_load",
+      JSON.stringify(draft.data)
+    );
 
-  console.log("[DraftView] Loading draft:", draftId);
-  showToast("Memuat draft ke formulir...", "info");
+    // Navigate to form
+    navigateTo("/form");
+
+    console.log("[DraftView] Loading draft:", draftId);
+    showToast("Memuat draft ke formulir...", "info");
+  }, 300);
 }
 
 /**
@@ -210,7 +231,7 @@ function attachDraftListeners() {
   loadButtons.forEach((button) => {
     button.addEventListener("click", (e) => {
       const draftId = e.currentTarget.getAttribute("data-id");
-      handleLoadDraft(draftId);
+      handleLoadDraft(draftId, e);
     });
   });
 

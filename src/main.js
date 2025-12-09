@@ -13,6 +13,12 @@ import "./style.css";
 // Import Router
 import { initRouter } from "./router/router.js";
 
+// Import Keyboard Navigation
+import {
+  initKeyboardNavigation,
+  enableKeyboardShortcuts,
+} from "./utils/keyboardNavigation.js";
+
 // Import All Views (they self-register for viewChanged events)
 import "./views/landingView.js";
 import "./views/formView.js";
@@ -35,8 +41,21 @@ function initApp() {
   // Initialize Router (handles view switching and navigation)
   initRouter();
 
+  // Initialize Keyboard Navigation & Accessibility
+  initKeyboardNavigation();
+  enableKeyboardShortcuts();
+
+  // Enable Bootstrap Tooltips globally
+  const tooltipTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  );
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+
   console.log("[App] Router initialized successfully");
-  console.log("[App] Phase 2: UI Skeleton & Routing - ACTIVE");
+  console.log("[App] Keyboard navigation & accessibility enabled");
+  console.log("[App] Phase 5.4: UI/UX Polish & Refinements - COMPLETED");
 }
 
 // Initialize app when DOM is ready

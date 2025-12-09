@@ -1,28 +1,51 @@
 /**
  * @file ToastNotification.js
  * @description Reusable Bootstrap Toast for non-blocking notifications
- * @version 1.0
- * @date 2025-12-08
+ * @version 1.1
+ * @date 2025-01-27
+ * @changelog
+ * - v1.1: Added backward compatibility for string parameter (message, type)
+ * - v1.0: Initial release with object parameter
  */
 
 /**
  * Show toast notification
- * @param {Object} options - Toast configuration
+ * @param {Object|string} options - Toast configuration object OR message string (for backward compatibility)
  * @param {string} options.title - Toast title
  * @param {string} options.message - Toast message
  * @param {string} [options.type='info'] - Toast type: 'success', 'error', 'warning', 'info'
  * @param {number} [options.duration=5000] - Auto-hide duration in milliseconds (0 = no auto-hide)
  * @param {Function} [options.onClose] - Callback when toast is closed
+ * @param {string} [typeParam] - Type parameter (for backward compatibility when first param is string)
  * @returns {void}
  */
-function showToast(options) {
-  const {
-    title = "Notifikasi",
-    message = "",
-    type = "info",
-    duration = 5000,
-    onClose,
-  } = options;
+function showToast(options, typeParam) {
+  // Backward compatibility: if first parameter is string, convert to object format
+  let config;
+
+  if (typeof options === "string") {
+    // Old style: showToast(message, type)
+    config = {
+      title: "Notifikasi",
+      message: options,
+      type: typeParam || "info",
+      duration: 5000,
+    };
+  } else if (typeof options === "object" && options !== null) {
+    // New style: showToast({ title, message, type, ... })
+    config = {
+      title: options.title || "Notifikasi",
+      message: options.message || "",
+      type: options.type || "info",
+      duration: options.duration !== undefined ? options.duration : 5000,
+      onClose: options.onClose,
+    };
+  } else {
+    console.error("[ToastNotification] Invalid options parameter");
+    return;
+  }
+
+  const { title, message, type, duration, onClose } = config;
 
   // Generate unique ID for this toast
   const toastId = `toast-${Date.now()}-${Math.random()
