@@ -128,106 +128,250 @@ export const VALIDATION_RULES = {
   },
 };
 
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Get all visible form fields (not in hidden containers)
+ * @private
+ * @param {HTMLFormElement|HTMLElement} container - Form or container element
+ * @returns {Array<HTMLElement>} Array of visible form fields
+ */
+const getVisibleFields = (container) => {
+  const allFields = container.querySelectorAll("input, select, textarea");
+  return Array.from(allFields).filter((field) => !field.closest(".d-none"));
+};
+
+/**
+ * Get feedback element for field (error message container)
+ * @private
+ * @param {HTMLElement} field - Form field element
+ * @returns {HTMLElement|null} Feedback element or null
+ */
+const getFeedbackElement = (field) => {
+  return field.nextElementSibling?.classList.contains("invalid-feedback")
+    ? field.nextElementSibling
+    : null;
+};
+
+/**
+ * Check if field is required and value is empty
+ * @private
+ * @param {HTMLElement} field - Form field element
+ * @param {string} value - Field value (trimmed)
+ * @returns {boolean} True if validation fails
+ */
+const validateRequired = (field, value) => {
+  if (field.hasAttribute("required") && !value) {
+    showFieldError(field, ERROR_MESSAGES.REQUIRED);
+    return false;
+  }
+  return true;
+};
+
+/**
+ * Validate field length (min and max)
+ * @private
+ * @param {HTMLElement} field - Form field element
+ * @param {string} value - Field value (trimmed)
+ * @param {Object} rules - Validation rules
+ * @returns {boolean} True if validation passes
+ */
+const validateLength = (field, value, rules) => {
+  if (rules?.minLength && value.length < rules.minLength) {
+    showFieldError(field, ERROR_MESSAGES.MIN_LENGTH(rules.minLength));
+    return false;
+  }
+  if (rules?.maxLength && value.length > rules.maxLength) {
+    showFieldError(field, ERROR_MESSAGES.MAX_LENGTH(rules.maxLength));
+    return false;
+  }
+  return true;
+};
+
+/**
+ * Validate numeric range (min and max value)
+ * @private
+ * @param {HTMLElement} field - Form field element
+ * @param {string} value - Field value (trimmed)
+ * @param {Object} rules - Validation rules
+ * @returns {boolean} True if validation passes
+ */
+const validateNumericRange = (field, value, rules) => {
+  if (field.type !== "number") return true;
+
+  const numValue = parseFloat(value);
+  if (rules?.min !== undefined && numValue < rules.min) {
+    showFieldError(field, ERROR_MESSAGES.MIN_VALUE(rules.min));
+    return false;
+  }
+  if (rules?.max !== undefined && numValue > rules.max) {
+    showFieldError(field, ERROR_MESSAGES.MAX_VALUE(rules.max));
+    return false;
+  }
+  return true;
+};
+
+/**
+ * Validate date field (max date = today)
+ * @private
+ * @param {HTMLElement} field - Form field element
+ * @param {string} value - Field value (date string)
+ * @param {Object} rules - Validation rules
+ * @returns {boolean} True if validation passes
+ */
+const validateDate = (field, value, rules) => {
+  if (field.type !== "date" || rules?.maxDate !== "today") return true;
+
+  const inputDate = new Date(value);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (inputDate > today) {
+    showFieldError(field, ERROR_MESSAGES.DATE_FUTURE);
+    return false;
+  }
+  return true;
+};
+
+/**
+ * Validate pattern (regex)
+ * @private
+ * @param {HTMLElement} field - Form field element
+ * @param {string} value - Field value (trimmed)
+ * @param {Object} rules - Validation rules
+ * @param {string} fieldName - Field name for special handling
+ * @returns {boolean} True if validation passes
+ */
+const validatePattern = (field, value, rules, fieldName) => {
+  if (!rules?.pattern || !value) return true;
+
+  if (!rules.pattern.test(value)) {
+    const message =
+      fieldName === "noHP" ? ERROR_MESSAGES.PHONE : ERROR_MESSAGES.PATTERN;
+    showFieldError(field, message);
+    return false;
+  }
+  return true;
+};
+
+/**
+ * Validate email format
+ * @private
+ * @param {HTMLElement} field - Form field element
+ * @param {string} value - Field value (trimmed)
+ * @param {Object} rules - Validation rules
+ * @returns {boolean} True if validation passes
+ */
+const validateEmail = (field, value, rules) => {
+  if (rules?.type !== "email" || !value) return true;
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(value)) {
+    showFieldError(field, ERROR_MESSAGES.EMAIL);
+    return false;
+  }
+  return true;
+};
+
+/**
+ * Run validation on field event (blur or input)
+ * Extracted to avoid code duplication
+ * @private
+ * @param {HTMLElement} field - Form field element
+ * @param {boolean} checkOnlyIfHasState - If true, only validate if field already has validation state
+ */
+const validateFieldOnEvent = (field, checkOnlyIfHasState = false) => {
+  try {
+    const isRequired = field.hasAttribute("required");
+    const hasValue = field.value.trim() !== "";
+
+    // Skip validation if checking only if has state AND doesn't have state
+    if (checkOnlyIfHasState) {
+      const hasState =
+        field.classList.contains("is-invalid") ||
+        field.classList.contains("is-valid");
+      if (!hasState) return;
+    }
+
+    // Clear validation first
+    clearFieldError(field);
+
+    // Only validate if required OR has value
+    if (!isRequired && !hasValue) {
+      clearFieldError(field);
+      return;
+    }
+
+    // Use built-in checkValidity
+    if (field.checkValidity()) {
+      showFieldValid(field);
+    } else {
+      const feedbackDiv = getFeedbackElement(field);
+      const errorMessage = feedbackDiv?.textContent || ERROR_MESSAGES.REQUIRED;
+      showFieldError(field, errorMessage);
+    }
+  } catch (error) {
+    console.error("[ValidationService] Error in validateFieldOnEvent:", error);
+  }
+};
+
+// ============================================================================
+// PUBLIC VALIDATION FUNCTIONS
+// ============================================================================
+
 /**
  * Validate a single field
  * @param {HTMLElement} field - Form field element
  * @returns {boolean} - True if valid, false if invalid
  */
 export function validateField(field) {
-  const fieldName = field.name || field.id;
-  const value = field.value.trim();
-  const rules = VALIDATION_RULES[fieldName];
-
-  // Clear previous errors first
-  clearFieldError(field);
-
-  // Check if field is visible (for conditional fields)
-  if (field.closest(".d-none")) {
-    return true; // Skip validation for hidden fields
-  }
-
-  // Check required
-  if (field.hasAttribute("required")) {
-    if (!value) {
-      showFieldError(field, ERROR_MESSAGES.REQUIRED);
+  try {
+    if (!field) {
+      console.error("[ValidationService] Field is null or undefined");
       return false;
     }
-  }
 
-  // If value is empty and field is not required, skip further validation
-  if (!value && !field.hasAttribute("required")) {
+    const fieldName = field.name || field.id;
+    const value = field.value.trim();
+    const rules = VALIDATION_RULES[fieldName];
+
+    // Clear previous errors
+    clearFieldError(field);
+
+    // Skip validation for hidden fields
+    if (field.closest(".d-none")) {
+      return true;
+    }
+
+    // Run validators in sequence - return false on first failure
+    if (!validateRequired(field, value)) return false;
+
+    // Skip further validation if value is empty and not required
+    if (!value && !field.hasAttribute("required")) {
+      return true;
+    }
+
+    if (!validateLength(field, value, rules)) return false;
+    if (!validateNumericRange(field, value, rules)) return false;
+    if (!validateDate(field, value, rules)) return false;
+    if (!validatePattern(field, value, rules, fieldName)) return false;
+    if (!validateEmail(field, value, rules)) return false;
+
+    // Final check with browser's built-in validation
+    if (!field.checkValidity()) {
+      showFieldError(field, field.validationMessage || ERROR_MESSAGES.REQUIRED);
+      return false;
+    }
+
+    // All checks passed
+    showFieldValid(field);
     return true;
-  }
-
-  // Check min length
-  if (rules?.minLength && value.length < rules.minLength) {
-    showFieldError(field, ERROR_MESSAGES.MIN_LENGTH(rules.minLength));
+  } catch (error) {
+    console.error("[ValidationService] Error in validateField:", error);
     return false;
   }
-
-  // Check max length
-  if (rules?.maxLength && value.length > rules.maxLength) {
-    showFieldError(field, ERROR_MESSAGES.MAX_LENGTH(rules.maxLength));
-    return false;
-  }
-
-  // Check min value for number inputs
-  if (field.type === "number" && rules?.min !== undefined) {
-    const numValue = parseFloat(value);
-    if (numValue < rules.min) {
-      showFieldError(field, ERROR_MESSAGES.MIN_VALUE(rules.min));
-      return false;
-    }
-  }
-
-  // Check max value for number inputs
-  if (field.type === "number" && rules?.max !== undefined) {
-    const numValue = parseFloat(value);
-    if (numValue > rules.max) {
-      showFieldError(field, ERROR_MESSAGES.MAX_VALUE(rules.max));
-      return false;
-    }
-  }
-
-  // Check date validation (max = today)
-  if (field.type === "date" && rules?.maxDate === "today") {
-    const inputDate = new Date(value);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (inputDate > today) {
-      showFieldError(field, ERROR_MESSAGES.DATE_FUTURE);
-      return false;
-    }
-  }
-
-  // Check pattern
-  if (rules?.pattern && !rules.pattern.test(value)) {
-    if (fieldName === "noHP") {
-      showFieldError(field, ERROR_MESSAGES.PHONE);
-    } else {
-      showFieldError(field, ERROR_MESSAGES.PATTERN);
-    }
-    return false;
-  }
-
-  // Check email format
-  if (rules?.type === "email" && value) {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(value)) {
-      showFieldError(field, ERROR_MESSAGES.EMAIL);
-      return false;
-    }
-  }
-
-  // Use browser's built-in validation
-  if (!field.checkValidity()) {
-    showFieldError(field, field.validationMessage || ERROR_MESSAGES.REQUIRED);
-    return false;
-  }
-
-  // If all checks pass, show valid state
-  showFieldValid(field);
-  return true;
 }
 
 /**
@@ -236,30 +380,23 @@ export function validateField(field) {
  * @returns {Object} - { isValid: boolean, firstInvalidField: HTMLElement|null }
  */
 export function validateForm(formElement) {
-  let isValid = true;
-  let firstInvalidField = null;
-
-  // Get all visible form fields
-  const fields = formElement.querySelectorAll(
-    "input:not(.d-none input), select:not(.d-none select), textarea:not(.d-none textarea)"
-  );
-
-  fields.forEach((field) => {
-    // Skip hidden conditional fields
-    if (field.closest(".d-none")) {
-      return;
+  try {
+    if (!formElement) {
+      console.error("[ValidationService] Form element is null or undefined");
+      return { isValid: false, firstInvalidField: null };
     }
 
-    const fieldValid = validateField(field);
-    if (!fieldValid) {
-      isValid = false;
-      if (!firstInvalidField) {
-        firstInvalidField = field;
-      }
-    }
-  });
+    const fields = getVisibleFields(formElement);
+    const invalidFields = fields.filter((field) => !validateField(field));
 
-  return { isValid, firstInvalidField };
+    return {
+      isValid: invalidFields.length === 0,
+      firstInvalidField: invalidFields[0] || null,
+    };
+  } catch (error) {
+    console.error("[ValidationService] Error in validateForm:", error);
+    return { isValid: false, firstInvalidField: null };
+  }
 }
 
 /**
@@ -271,9 +408,9 @@ export function showFieldError(field, message) {
   field.classList.remove("is-valid");
   field.classList.add("is-invalid");
 
-  // Update invalid-feedback div
-  const feedbackDiv = field.nextElementSibling;
-  if (feedbackDiv && feedbackDiv.classList.contains("invalid-feedback")) {
+  // Update invalid-feedback div with optional chaining
+  const feedbackDiv = getFeedbackElement(field);
+  if (feedbackDiv) {
     feedbackDiv.textContent = message;
   }
 }
@@ -300,7 +437,7 @@ export function clearFieldError(field) {
  * @param {HTMLFormElement} formElement - Form element
  */
 export function clearAllValidation(formElement) {
-  const fields = formElement.querySelectorAll("input, select, textarea");
+  const fields = getVisibleFields(formElement);
   fields.forEach((field) => clearFieldError(field));
 }
 
@@ -311,69 +448,36 @@ export function clearAllValidation(formElement) {
  * @param {HTMLFormElement} formElement - Form element
  */
 export function initializeRealTimeValidation(formElement) {
-  const fields = formElement.querySelectorAll("input, select, textarea");
+  try {
+    if (!formElement) {
+      console.error("[ValidationService] Form element is null or undefined");
+      return;
+    }
 
-  fields.forEach((field) => {
-    // Skip optional fields that are empty (don't show green border for empty optional)
-    field.addEventListener("blur", () => {
-      // Only validate if field is required OR has value
-      const isRequired = field.hasAttribute("required");
-      const hasValue = field.value.trim() !== "";
+    const fields = formElement.querySelectorAll("input, select, textarea");
 
-      if (isRequired || hasValue) {
-        // Check if field is valid
-        const isValid = field.checkValidity();
+    fields.forEach((field) => {
+      // Blur event: Validate on focus out
+      field.addEventListener("blur", () => {
+        validateFieldOnEvent(field, false); // Always validate on blur
+      });
 
-        if (isValid) {
-          // AC-VAL-002: Show green border for valid required field
-          showFieldValid(field);
-        } else {
-          // AC-VAL-001: Show red border and error message for invalid field
-          const feedbackDiv = field.nextElementSibling;
-          const errorMessage =
-            feedbackDiv && feedbackDiv.classList.contains("invalid-feedback")
-              ? feedbackDiv.textContent
-              : ERROR_MESSAGES.REQUIRED;
-          showFieldError(field, errorMessage);
-        }
-      } else {
-        // Optional field, empty - clear any validation state
-        clearFieldError(field);
-      }
+      // Input event: Validate only if field already has validation state (UX improvement)
+      // This removes error as user types
+      field.addEventListener("input", () => {
+        validateFieldOnEvent(field, true); // Only validate if has state
+      });
     });
 
-    // Also validate on input for better UX (remove error as user types)
-    field.addEventListener("input", () => {
-      // Only re-validate if field already has validation state
-      if (
-        field.classList.contains("is-invalid") ||
-        field.classList.contains("is-valid")
-      ) {
-        const isRequired = field.hasAttribute("required");
-        const hasValue = field.value.trim() !== "";
-
-        if (isRequired || hasValue) {
-          const isValid = field.checkValidity();
-          if (isValid) {
-            showFieldValid(field);
-          } else {
-            const feedbackDiv = field.nextElementSibling;
-            const errorMessage =
-              feedbackDiv && feedbackDiv.classList.contains("invalid-feedback")
-                ? feedbackDiv.textContent
-                : ERROR_MESSAGES.REQUIRED;
-            showFieldError(field, errorMessage);
-          }
-        } else {
-          clearFieldError(field);
-        }
-      }
-    });
-  });
-
-  console.log(
-    "[ValidationService] Real-time validation initialized for",
-    fields.length,
-    "fields"
-  );
+    console.log(
+      "[ValidationService] Real-time validation initialized for",
+      fields.length,
+      "fields"
+    );
+  } catch (error) {
+    console.error(
+      "[ValidationService] Error initializing real-time validation:",
+      error
+    );
+  }
 }

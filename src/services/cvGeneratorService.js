@@ -40,48 +40,28 @@ const MONTH_NAMES = [
  * formatDate('') // returns "-"
  * formatDate(null) // returns "-"
  */
-export function formatDate(dateString) {
-  // Handle empty values
-  if (!dateString || dateString === "") {
-    return "-";
-  }
+export const formatDate = (dateString) => {
+  if (!dateString || dateString === "") return "-";
 
   try {
-    // Split date string
     const parts = dateString.split("-");
-
-    // Validate format
-    if (parts.length !== 3) {
-      return "-";
-    }
+    if (parts.length !== 3) return "-";
 
     const [year, month, day] = parts;
-
-    // Parse and validate
     const yearNum = parseInt(year, 10);
     const monthNum = parseInt(month, 10);
     const dayNum = parseInt(day, 10);
 
-    // Validate ranges
-    if (isNaN(yearNum) || isNaN(monthNum) || isNaN(dayNum)) {
-      return "-";
-    }
+    if (isNaN(yearNum) || isNaN(monthNum) || isNaN(dayNum)) return "-";
+    if (monthNum < 1 || monthNum > 12) return "-";
+    if (dayNum < 1 || dayNum > 31) return "-";
 
-    if (monthNum < 1 || monthNum > 12) {
-      return "-";
-    }
-
-    if (dayNum < 1 || dayNum > 31) {
-      return "-";
-    }
-
-    // Format and return
     return `${dayNum} ${MONTH_NAMES[monthNum - 1]} ${yearNum}`;
   } catch (error) {
     console.error("[cvGeneratorService] Error formatting date:", error);
     return "-";
   }
-}
+};
 
 /**
  * Return value atau "-" jika kosong (null, undefined, empty string)
@@ -93,12 +73,10 @@ export function formatDate(dateString) {
  * formatEmpty(null) // returns "-"
  * formatEmpty(undefined) // returns "-"
  */
-export function formatEmpty(value) {
-  if (value === null || value === undefined || value === "") {
-    return "-";
-  }
+export const formatEmpty = (value) => {
+  if (value === null || value === undefined || value === "") return "-";
   return String(value).trim();
-}
+};
 
 /**
  * Get current date in Indonesian format "DD MMMM YYYY"
@@ -106,14 +84,317 @@ export function formatEmpty(value) {
  * @example
  * getCurrentDate() // returns "8 Desember 2025"
  */
-export function getCurrentDate() {
+export const getCurrentDate = () => {
   const now = new Date();
   const day = now.getDate();
   const month = MONTH_NAMES[now.getMonth()];
   const year = now.getFullYear();
-
   return `${day} ${month} ${year}`;
-}
+};
+
+/**
+ * Build section header with title and separator
+ * @private
+ * @param {string} title - Section title
+ * @returns {string} - Formatted section header
+ */
+const buildSectionHeader = (title) => {
+  return `${title}\n${"-".repeat(64)}\n`;
+};
+
+/**
+ * Build field line with label and value (label padded to 20 chars)
+ * @private
+ * @param {string} label - Field label
+ * @param {string} value - Field value
+ * @returns {string} - Formatted field line
+ */
+const buildFieldLine = (label, value) => {
+  return `${label.padEnd(20)}: ${value}\n`;
+};
+
+/**
+ * Build multiline field (e.g., textarea content)
+ * @private
+ * @param {string} label - Field label
+ * @param {string} value - Field value (multiline)
+ * @returns {string} - Formatted multiline field
+ */
+const buildMultilineField = (label, value) => {
+  return `${label}:\n${value}\n\n`;
+};
+
+/**
+ * Build CV header with title and date
+ * @private
+ * @param {string} currentDate - Current date formatted
+ * @returns {string} - Formatted header
+ */
+const buildHeader = (currentDate) => {
+  const divider = "=".repeat(64);
+  return [
+    divider,
+    "                    CURRICULUM VITAE TA'ARUF",
+    divider,
+    `Tanggal Pembuatan: ${currentDate}`,
+    "",
+  ].join("\n");
+};
+
+/**
+ * Build personal data section (Section I)
+ * @private
+ * @param {Object} data - Form data
+ * @param {string} tanggalLahirFormatted - Formatted birth date
+ * @returns {string} - Formatted section
+ */
+const buildPersonalDataSection = (data, tanggalLahirFormatted) => {
+  const lines = [
+    buildSectionHeader("I. DATA PRIBADI"),
+    buildFieldLine("Nama Lengkap", formatEmpty(data.namaLengkap)),
+    buildFieldLine("Nama Panggilan", formatEmpty(data.namaPanggilan)),
+    buildFieldLine(
+      "Tempat, Tgl Lahir",
+      `${formatEmpty(data.tempatLahir)}, ${tanggalLahirFormatted}`
+    ),
+    buildFieldLine("Jenis Kelamin", formatEmpty(data.jenisKelamin)),
+    buildFieldLine(
+      "Tinggi / Berat",
+      `${formatEmpty(data.tinggiBadan)} cm / ${formatEmpty(data.beratBadan)} kg`
+    ),
+    buildFieldLine("Warna Kulit", formatEmpty(data.warnaKulit)),
+    buildFieldLine("Suku Bangsa", formatEmpty(data.suku)),
+    buildFieldLine("Domisili Saat Ini", formatEmpty(data.domisili)),
+    buildFieldLine("Asal Daerah", formatEmpty(data.asalDaerah)),
+    buildFieldLine("Pekerjaan", formatEmpty(data.pekerjaan)),
+    buildFieldLine("Pengalaman Kerja", formatEmpty(data.pengalamanKerja)),
+    buildFieldLine("Penghasilan Bulanan", formatEmpty(data.penghasilanBulanan)),
+    buildFieldLine("Status Tempat Tinggal", formatEmpty(data.statusRumah)),
+    buildFieldLine("Status Pernikahan", formatEmpty(data.statusPernikahan)),
+  ];
+
+  // Conditional: Jumlah Anak
+  if (data.statusPernikahan === "Duda" || data.statusPernikahan === "Janda") {
+    lines.push(buildFieldLine("Jumlah Anak", formatEmpty(data.jumlahAnak)));
+  }
+
+  lines.push(
+    buildFieldLine("Pernah Khitbah", formatEmpty(data.pernahKhitbah)),
+    buildFieldLine("Status Izin Wali", formatEmpty(data.statusIzin)),
+    "\n"
+  );
+
+  return lines.join("");
+};
+
+/**
+ * Build education section (Section II)
+ * @private
+ * @param {Object} data - Form data
+ * @returns {string} - Formatted section
+ */
+const buildEducationSection = (data) => {
+  return [
+    buildSectionHeader("II. RIWAYAT PENDIDIKAN"),
+    buildMultilineField(
+      "Pendidikan Terakhir",
+      formatEmpty(data.pendidikanTerakhir)
+    ),
+    buildMultilineField(
+      "Pendidikan Non-Formal",
+      formatEmpty(data.pendidikanNonFormal)
+    ),
+    buildMultilineField(
+      "Prestasi / Keahlian Khusus",
+      formatEmpty(data.prestasi)
+    ),
+  ].join("");
+};
+
+/**
+ * Build family information section (Section III)
+ * @private
+ * @param {Object} data - Form data
+ * @returns {string} - Formatted section
+ */
+const buildFamilySection = (data) => {
+  return [
+    buildSectionHeader("III. INFORMASI KELUARGA"),
+    buildMultilineField("Data Ayah", formatEmpty(data.infoAyah)),
+    buildMultilineField("Data Ibu", formatEmpty(data.infoIbu)),
+    `Anak ke: ${formatEmpty(data.urutanAnak)}\n\n`,
+    buildMultilineField("Data Saudara", formatEmpty(data.infoSaudara)),
+  ].join("");
+};
+
+/**
+ * Build religion & worship section (Section IV)
+ * @private
+ * @param {Object} data - Form data
+ * @returns {string} - Formatted section
+ */
+const buildReligionSection = (data) => {
+  return [
+    buildSectionHeader("IV. IBADAH & PEMAHAMAN AGAMA"),
+    buildFieldLine("Status Muallaf", formatEmpty(data.statusMuallaf)),
+    "\n",
+    buildMultilineField(
+      "Pelaksanaan Shalat Wajib",
+      formatEmpty(data.shalatWajib)
+    ),
+    buildMultilineField(
+      "Kebiasaan Ibadah Sunnah",
+      formatEmpty(data.ibadahSunnah)
+    ),
+    buildMultilineField(
+      "Kemampuan Baca Al-Qur'an & Hafalan",
+      formatEmpty(data.bacaanQuran)
+    ),
+    buildMultilineField(
+      "Kajian / Ustadz Favorit",
+      formatEmpty(data.kajianFavorit)
+    ),
+    buildMultilineField(
+      "Organisasi / Komunitas Islam",
+      formatEmpty(data.afiliasiOrganisasi)
+    ),
+  ].join("");
+};
+
+/**
+ * Build profile & habits section (Section V)
+ * @private
+ * @param {Object} data - Form data
+ * @returns {string} - Formatted section
+ */
+const buildProfileSection = (data) => {
+  const lines = [
+    buildSectionHeader("V. PROFIL DIRI & KEBIASAAN"),
+    buildFieldLine("Hobi / Kegemaran", formatEmpty(data.hobi)),
+    buildFieldLine("Merokok", formatEmpty(data.merokok)),
+  ];
+
+  // Conditional gender-specific fields
+  if (data.jenisKelamin === "Laki-laki") {
+    lines.push(
+      buildFieldLine("Status Jenggot", formatEmpty(data.statusJenggot))
+    );
+  }
+
+  if (data.jenisKelamin === "Perempuan") {
+    lines.push(buildFieldLine("Status Hijab", formatEmpty(data.statusHijab)));
+  }
+
+  lines.push(
+    "\n",
+    buildMultilineField(
+      "Sifat Positif (Kelebihan)",
+      formatEmpty(data.sifatPositif)
+    ),
+    buildMultilineField(
+      "Sifat Negatif (Kekurangan)",
+      formatEmpty(data.sifatNegatif)
+    ),
+    buildMultilineField("Riwayat Penyakit", formatEmpty(data.riwayatPenyakit)),
+    buildMultilineField("Visi Misi Hidup", formatEmpty(data.visiMisiHidup))
+  );
+
+  return lines.join("");
+};
+
+/**
+ * Build marriage vision section (Section VI)
+ * @private
+ * @param {Object} data - Form data
+ * @returns {string} - Formatted section
+ */
+const buildMarriageVisionSection = (data) => {
+  const lines = [
+    buildSectionHeader("VI. VISI PERNIKAHAN"),
+    buildMultilineField(
+      "Visi & Misi Pernikahan",
+      formatEmpty(data.visiPernikahan)
+    ),
+    buildMultilineField(
+      "Kriteria Calon Pasangan",
+      formatEmpty(data.kriteriaPasangan)
+    ),
+    buildMultilineField(
+      "Pandangan tentang Mahar",
+      formatEmpty(data.pandanganMahar)
+    ),
+  ];
+
+  // Conditional gender-specific polygamy fields
+  if (data.jenisKelamin === "Laki-laki") {
+    lines.push(
+      buildFieldLine(
+        "Pandangan tentang Poligami",
+        formatEmpty(data.kesediaanPoligami)
+      )
+    );
+  }
+
+  if (data.jenisKelamin === "Perempuan") {
+    lines.push(
+      buildFieldLine(
+        "Kesediaan Dipoligami",
+        formatEmpty(data.kesediaanDipoligami)
+      )
+    );
+  }
+
+  lines.push(
+    buildFieldLine(
+      "Pandangan Istri Bekerja",
+      formatEmpty(data.pandanganNafkah)
+    ),
+    buildFieldLine(
+      "Kesediaan Pindah Domisili",
+      formatEmpty(data.kesediaanPindah)
+    ),
+    buildFieldLine("Target Waktu Menikah", formatEmpty(data.targetMenikah)),
+    "\n",
+    buildMultilineField(
+      "Rencana Setelah Menikah",
+      formatEmpty(data.rencanaSetelahMenikah)
+    )
+  );
+
+  return lines.join("");
+};
+
+/**
+ * Build contact section (Section VII)
+ * @private
+ * @param {Object} data - Form data
+ * @returns {string} - Formatted section
+ */
+const buildContactSection = (data) => {
+  return [
+    buildSectionHeader("VII. KONTAK (Untuk Keperluan Mediator)"),
+    buildFieldLine("No HP/WhatsApp", formatEmpty(data.noHP)),
+    buildFieldLine("Email", formatEmpty(data.email)),
+    buildFieldLine("Akun Sosmed", formatEmpty(data.akunSosmed)),
+    buildFieldLine("Kontak Wali", formatEmpty(data.kontakWali)),
+    "\n",
+  ].join("");
+};
+
+/**
+ * Build CV footer with disclaimer
+ * @private
+ * @returns {string} - Formatted footer
+ */
+const buildFooter = () => {
+  const divider = "=".repeat(64);
+  return [
+    divider,
+    "*Data ini diisi dengan sebenar-benarnya dan dapat",
+    "dipertanggungjawabkan.*",
+    divider,
+  ].join("\n");
+};
 
 // ============================================================================
 // MAIN GENERATOR FUNCTION
@@ -124,209 +405,34 @@ export function getCurrentDate() {
  * @param {Object} data - Form data object with 49 fields
  * @returns {string} - Formatted CV text ready for copy-paste
  */
-export function generateCV(data) {
-  // Validate input
-  if (!data || typeof data !== "object") {
-    console.error("[cvGeneratorService] Invalid data object provided");
-    return "";
+export const generateCV = (data) => {
+  try {
+    // Validate input
+    if (!data || typeof data !== "object") {
+      throw new Error("[cvGeneratorService] Data must be a non-null object");
+    }
+
+    // Prepare formatted data
+    const currentDate = getCurrentDate();
+    const tanggalLahirFormatted = formatDate(data.tanggalLahir);
+
+    // Build CV sections using functional composition
+    const sections = [
+      buildHeader(currentDate),
+      buildPersonalDataSection(data, tanggalLahirFormatted),
+      buildEducationSection(data),
+      buildFamilySection(data),
+      buildReligionSection(data),
+      buildProfileSection(data),
+      buildMarriageVisionSection(data),
+      buildContactSection(data),
+      buildFooter(),
+    ];
+
+    // Join all sections with newlines
+    return sections.join("\n");
+  } catch (error) {
+    console.error("[cvGeneratorService] Error generating CV:", error);
+    throw error;
   }
-
-  // Setup conditional flags
-  const isLakiLaki = data.jenisKelamin === "Laki-laki";
-  const isPerempuan = data.jenisKelamin === "Perempuan";
-  const isDudaJanda =
-    data.statusPernikahan === "Duda" || data.statusPernikahan === "Janda";
-
-  // Format tanggal lahir
-  const tanggalLahirFormatted = formatDate(data.tanggalLahir);
-
-  // Get current date for header
-  const currentDate = getCurrentDate();
-
-  // Build CV text using template literals
-  let cvText = "";
-
-  // ========================================================================
-  // HEADER
-  // ========================================================================
-  cvText +=
-    "================================================================\n";
-  cvText += "                    CURRICULUM VITAE TA'ARUF\n";
-  cvText +=
-    "================================================================\n";
-  cvText += `Tanggal Pembuatan: ${currentDate}\n\n`;
-
-  // ========================================================================
-  // SECTION I: DATA PRIBADI
-  // ========================================================================
-  cvText += "I. DATA PRIBADI\n";
-  cvText +=
-    "----------------------------------------------------------------\n";
-  cvText += `Nama Lengkap        : ${formatEmpty(data.namaLengkap)}\n`;
-  cvText += `Nama Panggilan      : ${formatEmpty(data.namaPanggilan)}\n`;
-  cvText += `Tempat, Tgl Lahir   : ${formatEmpty(
-    data.tempatLahir
-  )}, ${tanggalLahirFormatted}\n`;
-  cvText += `Jenis Kelamin       : ${formatEmpty(data.jenisKelamin)}\n`;
-  cvText += `Tinggi / Berat      : ${formatEmpty(
-    data.tinggiBadan
-  )} cm / ${formatEmpty(data.beratBadan)} kg\n`;
-  cvText += `Warna Kulit         : ${formatEmpty(data.warnaKulit)}\n`;
-  cvText += `Suku Bangsa         : ${formatEmpty(data.suku)}\n`;
-  cvText += `Domisili Saat Ini   : ${formatEmpty(data.domisili)}\n`;
-  cvText += `Asal Daerah         : ${formatEmpty(data.asalDaerah)}\n`;
-  cvText += `Pekerjaan           : ${formatEmpty(data.pekerjaan)}\n`;
-  cvText += `Pengalaman Kerja    : ${formatEmpty(data.pengalamanKerja)}\n`;
-  cvText += `Penghasilan Bulanan : ${formatEmpty(data.penghasilanBulanan)}\n`;
-  cvText += `Status Tempat Tinggal: ${formatEmpty(data.statusRumah)}\n`;
-  cvText += `Status Pernikahan   : ${formatEmpty(data.statusPernikahan)}\n`;
-
-  // Conditional: Jumlah Anak (only if Duda/Janda)
-  if (isDudaJanda) {
-    cvText += `Jumlah Anak         : ${formatEmpty(data.jumlahAnak)}\n`;
-  }
-
-  cvText += `Pernah Khitbah      : ${formatEmpty(data.pernahKhitbah)}\n`;
-  cvText += `Status Izin Wali    : ${formatEmpty(data.statusIzin)}\n\n`;
-
-  // ========================================================================
-  // SECTION II: RIWAYAT PENDIDIKAN
-  // ========================================================================
-  cvText += "II. RIWAYAT PENDIDIKAN\n";
-  cvText +=
-    "----------------------------------------------------------------\n";
-  cvText += "Pendidikan Terakhir:\n";
-  cvText += `${formatEmpty(data.pendidikanTerakhir)}\n\n`;
-  cvText += "Pendidikan Non-Formal:\n";
-  cvText += `${formatEmpty(data.pendidikanNonFormal)}\n\n`;
-  cvText += "Prestasi / Keahlian Khusus:\n";
-  cvText += `${formatEmpty(data.prestasi)}\n\n`;
-
-  // ========================================================================
-  // SECTION III: INFORMASI KELUARGA
-  // ========================================================================
-  cvText += "III. INFORMASI KELUARGA\n";
-  cvText +=
-    "----------------------------------------------------------------\n";
-  cvText += "Data Ayah:\n";
-  cvText += `${formatEmpty(data.infoAyah)}\n\n`;
-  cvText += "Data Ibu:\n";
-  cvText += `${formatEmpty(data.infoIbu)}\n\n`;
-  cvText += `Anak ke: ${formatEmpty(data.urutanAnak)}\n\n`;
-  cvText += "Data Saudara:\n";
-  cvText += `${formatEmpty(data.infoSaudara)}\n\n`;
-
-  // ========================================================================
-  // SECTION IV: IBADAH & PEMAHAMAN AGAMA
-  // ========================================================================
-  cvText += "IV. IBADAH & PEMAHAMAN AGAMA\n";
-  cvText +=
-    "----------------------------------------------------------------\n";
-  cvText += `Status Muallaf      : ${formatEmpty(data.statusMuallaf)}\n\n`;
-  cvText += "Pelaksanaan Shalat Wajib:\n";
-  cvText += `${formatEmpty(data.shalatWajib)}\n\n`;
-  cvText += "Kebiasaan Ibadah Sunnah:\n";
-  cvText += `${formatEmpty(data.ibadahSunnah)}\n\n`;
-  cvText += "Kemampuan Baca Al-Qur'an & Hafalan:\n";
-  cvText += `${formatEmpty(data.bacaanQuran)}\n\n`;
-  cvText += "Kajian / Ustadz Favorit:\n";
-  cvText += `${formatEmpty(data.kajianFavorit)}\n\n`;
-  cvText += "Organisasi / Komunitas Islam:\n";
-  cvText += `${formatEmpty(data.afiliasiOrganisasi)}\n\n`;
-
-  // ========================================================================
-  // SECTION V: PROFIL DIRI & KEBIASAAN
-  // ========================================================================
-  cvText += "V. PROFIL DIRI & KEBIASAAN\n";
-  cvText +=
-    "----------------------------------------------------------------\n";
-  cvText += `Hobi / Kegemaran    : ${formatEmpty(data.hobi)}\n`;
-  cvText += `Merokok             : ${formatEmpty(data.merokok)}\n`;
-
-  // Conditional: Status Jenggot (only if Laki-laki)
-  if (isLakiLaki) {
-    cvText += `Status Jenggot      : ${formatEmpty(data.statusJenggot)}\n`;
-  }
-
-  // Conditional: Status Hijab (only if Perempuan)
-  if (isPerempuan) {
-    cvText += `Status Hijab        : ${formatEmpty(data.statusHijab)}\n`;
-  }
-
-  cvText += "\n";
-  cvText += "Sifat Positif (Kelebihan):\n";
-  cvText += `${formatEmpty(data.sifatPositif)}\n\n`;
-  cvText += "Sifat Negatif (Kekurangan):\n";
-  cvText += `${formatEmpty(data.sifatNegatif)}\n\n`;
-  cvText += "Riwayat Penyakit:\n";
-  cvText += `${formatEmpty(data.riwayatPenyakit)}\n\n`;
-  cvText += "Visi Misi Hidup:\n";
-  cvText += `${formatEmpty(data.visiMisiHidup)}\n\n`;
-
-  // ========================================================================
-  // SECTION VI: VISI PERNIKAHAN
-  // ========================================================================
-  cvText += "VI. VISI PERNIKAHAN\n";
-  cvText +=
-    "----------------------------------------------------------------\n";
-  cvText += "Visi & Misi Pernikahan:\n";
-  cvText += `${formatEmpty(data.visiPernikahan)}\n\n`;
-  cvText += "Kriteria Calon Pasangan:\n";
-  cvText += `${formatEmpty(data.kriteriaPasangan)}\n\n`;
-  cvText += "Pandangan tentang Mahar:\n";
-  cvText += `${formatEmpty(data.pandanganMahar)}\n\n`;
-
-  // Conditional: Pandangan Poligami (only if Laki-laki)
-  if (isLakiLaki) {
-    cvText += `Pandangan tentang Poligami: ${formatEmpty(
-      data.kesediaanPoligami
-    )}\n`;
-  }
-
-  // Conditional: Kesediaan Dipoligami (only if Perempuan)
-  if (isPerempuan) {
-    cvText += `Kesediaan Dipoligami: ${formatEmpty(
-      data.kesediaanDipoligami
-    )}\n`;
-  }
-
-  cvText += `Pandangan Istri Bekerja: ${formatEmpty(data.pandanganNafkah)}\n`;
-  cvText += `Kesediaan Pindah Domisili: ${formatEmpty(data.kesediaanPindah)}\n`;
-  cvText += `Target Waktu Menikah: ${formatEmpty(data.targetMenikah)}\n\n`;
-  cvText += "Rencana Setelah Menikah:\n";
-  cvText += `${formatEmpty(data.rencanaSetelahMenikah)}\n\n`;
-
-  // ========================================================================
-  // SECTION VII: KONTAK
-  // ========================================================================
-  cvText += "VII. KONTAK (Untuk Keperluan Mediator)\n";
-  cvText +=
-    "----------------------------------------------------------------\n";
-  cvText += `No HP/WhatsApp  : ${formatEmpty(data.noHP)}\n`;
-  cvText += `Email           : ${formatEmpty(data.email)}\n`;
-  cvText += `Akun Sosmed     : ${formatEmpty(data.akunSosmed)}\n`;
-  cvText += `Kontak Wali     : ${formatEmpty(data.kontakWali)}\n\n`;
-
-  // ========================================================================
-  // FOOTER
-  // ========================================================================
-  cvText +=
-    "================================================================\n";
-  cvText += "*Data ini diisi dengan sebenar-benarnya dan dapat\n";
-  cvText += "dipertanggungjawabkan.*\n";
-  cvText +=
-    "================================================================\n";
-
-  return cvText;
-}
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
-export default {
-  generateCV,
-  formatDate,
-  formatEmpty,
-  getCurrentDate,
 };

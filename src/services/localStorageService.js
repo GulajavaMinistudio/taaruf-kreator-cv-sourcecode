@@ -133,6 +133,54 @@ function _load(key) {
 // ============================================================================
 
 /**
+ * Pure function: Create a new draft object
+ * @private
+ * @param {Partial<FormData>} formData - Form data
+ * @param {string|null} draftName - Custom draft name
+ * @returns {DraftObject} New draft object
+ */
+const createNewDraft = (formData, draftName = null) => {
+  const id = generateDraftId();
+  const now = getISODateString();
+  const name =
+    draftName ||
+    `Draft - ${formData.namaLengkap || "Tanpa Nama"} - ${formatDateDisplay(
+      now
+    )}`;
+
+  return {
+    id,
+    name,
+    createdAt: now,
+    lastUpdated: now,
+    data: formData,
+  };
+};
+
+/**
+ * Pure function: Update existing draft in array (immutable)
+ * @private
+ * @param {Array<DraftObject>} drafts - Current drafts array
+ * @param {string} existingId - Draft ID to update
+ * @param {Partial<FormData>} formData - Updated form data
+ * @param {string|null} draftName - Updated draft name (optional)
+ * @returns {Array<DraftObject>} New drafts array with updated draft
+ */
+const updateExistingDraft = (drafts, existingId, formData, draftName) => {
+  const now = getISODateString();
+  return drafts.map((draft) =>
+    draft.id === existingId
+      ? {
+          ...draft,
+          lastUpdated: now,
+          data: formData,
+          ...(draftName && { name: draftName }),
+        }
+      : draft
+  );
+};
+
+/**
  * Save a new draft or update existing draft
  * @param {Partial<FormData>} formData - Form data (can be incomplete)
  * @param {string} [draftName] - Custom draft name (optional)
@@ -144,58 +192,37 @@ export function saveDraft(formData, draftName = null, existingId = null) {
     const draftsResult = _load(STORAGE_KEYS.DRAFTS);
     const drafts = draftsResult.data || [];
 
-    const now = getISODateString();
-
     if (existingId) {
-      // Update existing draft
-      const index = drafts.findIndex((d) => d.id === existingId);
-
-      if (index === -1) {
+      // Verify draft exists before update
+      const draftExists = drafts.some((draft) => draft.id === existingId);
+      if (!draftExists) {
         return {
           success: false,
           message: "Draft tidak ditemukan",
         };
       }
 
-      drafts[index] = {
-        ...drafts[index],
-        lastUpdated: now,
-        data: formData,
-      };
+      const updatedDrafts = updateExistingDraft(
+        drafts,
+        existingId,
+        formData,
+        draftName
+      );
+      const saveResult = _save(STORAGE_KEYS.DRAFTS, updatedDrafts);
 
-      if (draftName) {
-        drafts[index].name = draftName;
-      }
+      return saveResult.success
+        ? { ...saveResult, data: { id: existingId } }
+        : saveResult;
     } else {
       // Create new draft
-      const id = generateDraftId();
-      const name =
-        draftName ||
-        `Draft - ${formData.namaLengkap || "Tanpa Nama"} - ${formatDateDisplay(
-          now
-        )}`;
+      const newDraft = createNewDraft(formData, draftName);
+      const updatedDrafts = [...drafts, newDraft];
+      const saveResult = _save(STORAGE_KEYS.DRAFTS, updatedDrafts);
 
-      const newDraft = {
-        id,
-        name,
-        createdAt: now,
-        lastUpdated: now,
-        data: formData,
-      };
-
-      drafts.push(newDraft);
+      return saveResult.success
+        ? { ...saveResult, data: { id: newDraft.id } }
+        : saveResult;
     }
-
-    const saveResult = _save(STORAGE_KEYS.DRAFTS, drafts);
-
-    if (saveResult.success) {
-      return {
-        ...saveResult,
-        data: { id: existingId || drafts[drafts.length - 1].id },
-      };
-    }
-
-    return saveResult;
   } catch (error) {
     return {
       success: false,
@@ -249,15 +276,17 @@ export function updateDraft(id, formData, draftName = null) {
 export function deleteDraft(id) {
   try {
     const drafts = getDrafts();
-    const filteredDrafts = drafts.filter((draft) => draft.id !== id);
 
-    if (drafts.length === filteredDrafts.length) {
+    // Check if draft exists
+    const draftExists = drafts.some((draft) => draft.id === id);
+    if (!draftExists) {
       return {
         success: false,
         message: "Draft tidak ditemukan",
       };
     }
 
+    const filteredDrafts = drafts.filter((draft) => draft.id !== id);
     return _save(STORAGE_KEYS.DRAFTS, filteredDrafts);
   } catch (error) {
     return {
@@ -297,18 +326,11 @@ export function saveHistory(formData, cvTextContent, customName = null) {
       sourceData: formData,
     };
 
-    history.push(historyItem);
+    // Immutable array update
+    const updatedHistory = [...history, historyItem];
+    const saveResult = _save(STORAGE_KEYS.HISTORY, updatedHistory);
 
-    const saveResult = _save(STORAGE_KEYS.HISTORY, history);
-
-    if (saveResult.success) {
-      return {
-        ...saveResult,
-        data: { id },
-      };
-    }
-
-    return saveResult;
+    return saveResult.success ? { ...saveResult, data: { id } } : saveResult;
   } catch (error) {
     return {
       success: false,
@@ -351,15 +373,17 @@ export function getHistoryById(id) {
 export function deleteHistory(id) {
   try {
     const history = getHistory();
-    const filteredHistory = history.filter((item) => item.id !== id);
 
-    if (history.length === filteredHistory.length) {
+    // Check if history item exists
+    const itemExists = history.some((item) => item.id === id);
+    if (!itemExists) {
       return {
         success: false,
         message: "History tidak ditemukan",
       };
     }
 
+    const filteredHistory = history.filter((item) => item.id !== id);
     return _save(STORAGE_KEYS.HISTORY, filteredHistory);
   } catch (error) {
     return {
@@ -375,29 +399,33 @@ export function deleteHistory(id) {
 // ============================================================================
 
 /**
- * Get application settings
+ * Get application settings (pure getter, no side effects)
  * @returns {SettingsObject} Settings object
  */
 export function getSettings() {
   const result = _load(STORAGE_KEYS.SETTINGS);
 
   if (result.success && result.data) {
-    // Update lastAccessed
-    const settings = {
+    return {
       ...DEFAULT_SETTINGS,
       ...result.data,
-      lastAccessed: getISODateString(),
     };
-
-    // Save updated lastAccessed (fire and forget)
-    _save(STORAGE_KEYS.SETTINGS, settings);
-
-    return settings;
   }
 
-  // Initialize with default settings
-  _save(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
   return { ...DEFAULT_SETTINGS };
+}
+
+/**
+ * Update lastAccessed timestamp for settings
+ * Call this when you want to track when settings were last accessed
+ * @returns {Object} Result object
+ */
+export function touchSettings() {
+  const currentSettings = getSettings();
+  return saveSettings({
+    ...currentSettings,
+    lastAccessed: getISODateString(),
+  });
 }
 
 /**
