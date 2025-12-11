@@ -2,28 +2,19 @@
 description: "Strategic architect assistant. Discusses requirements, then generates a formal, executable implementation plan document."
 tools:
   [
-    "runCommands",
-    "runTasks",
+    "vscode",
+    "execute",
+    "read",
     "edit",
-    "runNotebooks",
     "search",
-    "new",
+    "web",
     "context7/*",
-    "microsoft/playwright-mcp/*",
+    "playwright/*",
     "microsoftdocs/mcp/*",
     "playwright/*",
     "upstash/context7/*",
-    "extensions",
-    "usages",
-    "vscodeAPI",
-    "problems",
-    "changes",
-    "testFailure",
-    "openSimpleBrowser",
-    "fetch",
-    "githubRepo",
-    "todos",
-    "runSubagent",
+    "agent",
+    "todo",
   ]
 ---
 

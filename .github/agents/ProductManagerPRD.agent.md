@@ -2,29 +2,20 @@
 description: "Generate a comprehensive Product Requirements Document (PRD) in Markdown, detailing user stories, acceptance criteria, technical considerations, and metrics. Optionally create GitHub issues upon user confirmation."
 tools:
   [
+    "vscode",
+    "execute",
+    "read",
     "edit",
-    "runNotebooks",
     "search",
-    "new",
-    "runCommands",
-    "runTasks",
+    "web",
     "context7/*",
     "microsoft/markitdown/*",
-    "microsoft/playwright-mcp/*",
+    "playwright/*",
     "microsoftdocs/mcp/*",
     "playwright/*",
     "upstash/context7/*",
-    "usages",
-    "vscodeAPI",
-    "problems",
-    "changes",
-    "testFailure",
-    "openSimpleBrowser",
-    "fetch",
-    "githubRepo",
-    "extensions",
-    "todos",
-    "runSubagent",
+    "agent",
+    "todo",
   ]
 ---
 

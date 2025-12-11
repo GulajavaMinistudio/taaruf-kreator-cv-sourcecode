@@ -2,28 +2,19 @@
 description: "Menganalisis sesi terakhir untuk mencatat progress, mengambil pelajaran, dan menyimpannya ke instruksi memory proyek."
 tools:
   [
-    "runCommands",
-    "runTasks",
+    "vscode",
+    "execute",
+    "read",
     "edit",
-    "runNotebooks",
     "search",
-    "new",
+    "web",
     "context7/*",
-    "microsoft/playwright-mcp/*",
+    "playwright/*",
     "microsoftdocs/mcp/*",
     "playwright/*",
     "upstash/context7/*",
-    "extensions",
-    "usages",
-    "vscodeAPI",
-    "problems",
-    "changes",
-    "testFailure",
-    "openSimpleBrowser",
-    "fetch",
-    "githubRepo",
-    "todos",
-    "runSubagent",
+    "agent",
+    "todo",
   ]
 ---
 

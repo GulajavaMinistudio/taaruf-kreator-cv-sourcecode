@@ -1,8 +1,21 @@
 ---
-mode: 'agent'
-description: 'Create a new implementation plan file for new features, refactoring existing code or upgrading packages, design, architecture or infrastructure.'
-tools: ['changes', 'codebase', 'editFiles', 'extensions', 'fetch', 'githubRepo', 'openSimpleBrowser', 'problems', 'runTasks', 'search', 'searchResults', 'terminalLastCommand', 'terminalSelection', 'testFailure', 'usages', 'vscodeAPI']
+agent: "agent"
+description: "Create a new implementation plan file for new features, refactoring existing code or upgrading packages, design, architecture or infrastructure."
+tools:
+  [
+    "vscode",
+    "execute",
+    "read",
+    "edit",
+    "search",
+    "web",
+    "context7/*",
+    "upstash/context7/*",
+    "agent",
+    "todo",
+  ]
 ---
+
 # Create Implementation Plan
 
 ## Primary Directive
@@ -99,21 +112,21 @@ tags: [Optional: List of relevant tags or categories, e.g., `feature`, `upgrade`
 
 - GOAL-001: [Describe the goal of this phase, e.g., "Implement feature X", "Refactor module Y", etc.]
 
-| Task | Description | Completed | Date |
-|------|-------------|-----------|------|
-| TASK-001 | Description of task 1 | ✅ | 2025-04-25 |
-| TASK-002 | Description of task 2 | |  |
-| TASK-003 | Description of task 3 | |  |
+| Task     | Description           | Completed | Date       |
+| -------- | --------------------- | --------- | ---------- |
+| TASK-001 | Description of task 1 | ✅        | 2025-04-25 |
+| TASK-002 | Description of task 2 |           |            |
+| TASK-003 | Description of task 3 |           |            |
 
 ### Implementation Phase 2
 
 - GOAL-002: [Describe the goal of this phase, e.g., "Implement feature X", "Refactor module Y", etc.]
 
-| Task | Description | Completed | Date |
-|------|-------------|-----------|------|
-| TASK-004 | Description of task 4 | |  |
-| TASK-005 | Description of task 5 | |  |
-| TASK-006 | Description of task 6 | |  |
+| Task     | Description           | Completed | Date |
+| -------- | --------------------- | --------- | ---- |
+| TASK-004 | Description of task 4 |           |      |
+| TASK-005 | Description of task 5 |           |      |
+| TASK-006 | Description of task 6 |           |      |
 
 ## 3. Alternatives
 

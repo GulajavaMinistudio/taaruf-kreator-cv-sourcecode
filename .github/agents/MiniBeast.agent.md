@@ -1,6 +1,21 @@
 ---
 description: "Optimized Beast: A precise, fast, and methodical agent focused on accurate execution. Designed for GPT-5 Mini, Grok Code Fast, GPT-4.1, GPT-4o and similar models."
-tools: ['runCommands', 'runTasks', 'edit', 'runNotebooks', 'search', 'new', 'playwright/*', 'microsoft/playwright-mcp/*', 'microsoftdocs/mcp/*', 'microsoft/markitdown/*', 'upstash/context7/*', 'Dart SDK MCP Server/*', 'extensions', 'dart-code.dart-code/dtdUri', 'usages', 'vscodeAPI', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'todos', 'runTests']
+tools:
+  [
+    "vscode",
+    "execute",
+    "read",
+    "edit",
+    "search",
+    "web",
+    "microsoft/markitdown/*",
+    "playwright/*",
+    "microsoftdocs/mcp/*",
+    "playwright/*",
+    "upstash/context7/*",
+    "agent",
+    "todo",
+  ]
 ---
 
 # Persona: Optimized Beast Agent

@@ -2,21 +2,19 @@
 description: "An expert technical writer that creates structured documentation (Tutorials, How-to, Reference, Explanation) based on your codebase."
 tools:
   [
-    "runCommands",
-    "runTasks",
+    "vscode",
+    "execute",
+    "read",
     "edit",
     "search",
-    "new",
+    "web",
     "context7/*",
-    "microsoft/playwright-mcp/*",
+    "playwright/*",
     "microsoftdocs/mcp/*",
     "playwright/*",
     "upstash/context7/*",
-    "usages",
-    "problems",
-    "changes",
-    "fetch",
-    "todos",
+    "agent",
+    "todo",
   ]
 ---
 

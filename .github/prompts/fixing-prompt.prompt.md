@@ -1,5 +1,5 @@
 ---
-mode: ask
+agent: "ask"
 ---
 
 # Prompt: Prompt Refinement and Optimization

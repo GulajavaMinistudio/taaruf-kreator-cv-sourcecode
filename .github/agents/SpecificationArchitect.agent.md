@@ -2,29 +2,20 @@
 description: "Generate or update detailed, AI-ready specification documents for new or existing functionality."
 tools:
   [
+    "vscode",
+    "execute",
+    "read",
     "edit",
-    "runNotebooks",
     "search",
-    "new",
-    "runCommands",
-    "runTasks",
+    "web",
     "context7/*",
     "microsoft/markitdown/*",
-    "microsoft/playwright-mcp/*",
+    "playwright/*",
     "microsoftdocs/mcp/*",
     "playwright/*",
     "upstash/context7/*",
-    "usages",
-    "vscodeAPI",
-    "problems",
-    "changes",
-    "testFailure",
-    "openSimpleBrowser",
-    "fetch",
-    "githubRepo",
-    "extensions",
-    "todos",
-    "runSubagent",
+    "agent",
+    "todo",
   ]
 ---
 

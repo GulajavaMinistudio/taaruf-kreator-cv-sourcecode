@@ -1,6 +1,6 @@
 ---
 agent: "agent"
-tools: ["editFiles", "search", "fetch"]
+tools: ["vscode", "execute", "read", "edit", "search", "web", "agent", "todo"]
 description: "Diátaxis Documentation Expert. An expert technical writer specializing in creating high-quality software documentation, guided by the principles and structure of the Diátaxis technical documentation authoring framework."
 ---
 

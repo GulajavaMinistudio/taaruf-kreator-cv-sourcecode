@@ -1,33 +1,21 @@
 ---
-agent: "BeastModeDev"
+agent: "agent"
 description: "Review and refactor code in your project according to defined instructions"
 tools:
   [
-    "runCommands",
-    "runTasks",
+    "vscode",
+    "execute",
+    "read",
     "edit",
-    "runNotebooks",
     "search",
-    "new",
+    "web",
     "context7/*",
-    "microsoft/playwright-mcp/*",
+    "playwright/*",
     "microsoftdocs/mcp/*",
     "playwright/*",
     "upstash/context7/*",
-    "Dart SDK MCP Server/*",
-    "extensions",
-    "dart-code.dart-code/dtdUri",
-    "usages",
-    "vscodeAPI",
-    "problems",
-    "changes",
-    "testFailure",
-    "openSimpleBrowser",
-    "fetch",
-    "githubRepo",
-    "todos",
-    "runSubagent",
-    "runTests",
+    "agent",
+    "todo",
   ]
 ---
 
