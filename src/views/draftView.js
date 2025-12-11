@@ -184,7 +184,7 @@ function handleLoadDraft(draftId, event) {
     navigateTo("/form");
 
     console.log("[DraftView] Loading draft:", draftId);
-    showToast("Memuat draft ke formulir...", "info");
+    showToast("Memuat draft ke formulir...", "loading");
   }, 300);
 }
 

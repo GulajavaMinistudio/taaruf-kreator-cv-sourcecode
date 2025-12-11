@@ -130,6 +130,10 @@ function getToastConfig(type) {
       icon: "bi bi-info-circle-fill text-primary",
       headerClass: "bg-primary bg-opacity-10",
     },
+    loading: {
+      icon: "spinner-border spinner-border-sm text-white",
+      headerClass: "bg-danger text-white",
+    },
   };
 
   return configs[type] || configs.info;

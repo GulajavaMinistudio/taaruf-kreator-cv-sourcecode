@@ -282,6 +282,11 @@ function attachEventListeners() {
  */
 function initResultView() {
   renderResultView();
+
+  // Clear temporary form data after CV is generated
+  // This prevents conflicts when loading drafts later
+  sessionStorage.removeItem("taaruf_cv_temp_data");
+  console.log("[ResultView] Cleared temporary form data");
 }
 
 // Listen for view change event

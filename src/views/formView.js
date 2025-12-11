@@ -1,9 +1,11 @@
 /**
  * @file formView.js
  * @description Form Page View - CV Input Form with Validation
- * @version 2.2
- * @date 2025-01-27
+ * @version 2.4
+ * @date 2025-12-11
  * @changelog
+ * - v2.4 (2025-12-11): Fixed priority logic for draft vs preview data (BUG-FIX-002)
+ * - v2.3 (2025-12-11): Fixed form data restoration from Preview page (BUG-FIX-001)
  * - v2.2 (2025-01-27): Integrated real-time validation on blur (AC-VAL-001, AC-VAL-002)
  */
 
@@ -1313,7 +1315,7 @@ function initFormView() {
     initializeRealTimeValidation(form);
   }
 
-  // Check if there's a draft to load from sessionStorage
+  // Priority 1: Check if there's a draft to load from Draft page (explicit user action)
   const draftToLoad = sessionStorage.getItem("taaruf_cv_draft_to_load");
   if (draftToLoad) {
     try {
@@ -1324,10 +1326,39 @@ function initFormView() {
         loadDraftToForm(draftData);
         // Clear sessionStorage after loading
         sessionStorage.removeItem("taaruf_cv_draft_to_load");
+        console.log("[FormView] Draft loaded from Draft page");
       }, 100);
+
+      // Exit early - draft has highest priority
+      console.log("[FormView] Form view initialized with draft data");
+      return;
     } catch (error) {
       console.error("[FormView] Error loading draft:", error);
       showToast("Gagal memuat draft", "error");
+    }
+  }
+
+  // Priority 2: Check if there's temporary data from Preview page (auto-restore)
+  const tempData = sessionStorage.getItem("taaruf_cv_temp_data");
+  if (tempData) {
+    try {
+      const formData = JSON.parse(tempData);
+
+      // Wait for form to be fully rendered before loading
+      setTimeout(() => {
+        loadDraftToForm(formData);
+        // Clear temp data after restoring to prevent conflicts
+        sessionStorage.removeItem("taaruf_cv_temp_data");
+        console.log(
+          "[FormView] Restored data from preview (temp data cleared)"
+        );
+      }, 100);
+
+      console.log("[FormView] Form view initialized with preview data");
+      return;
+    } catch (error) {
+      console.error("[FormView] Error loading temp data:", error);
+      showToast("Gagal memuat data dari preview", "error");
     }
   }
 

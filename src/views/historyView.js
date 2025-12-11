@@ -145,9 +145,9 @@ function renderHistoryList(container, history) {
             }
           </div>
           <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-info btn-view-history" data-id="${
+            <button class="btn btn-sm btn-view-history" data-id="${
               item.id
-            }" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat CV dalam modal">
+            }" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat CV dalam modal" style="background-color: #1a7431; color: white; border-color: #1a7431;">
               <i class="bi bi-eye"></i> Lihat
             </button>
             <button class="btn btn-sm btn-primary btn-copy-history" data-id="${
