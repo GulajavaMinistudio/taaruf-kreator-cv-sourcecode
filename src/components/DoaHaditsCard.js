@@ -99,8 +99,11 @@ function attachCopyListeners(containerId) {
   const copyButtons = container.querySelectorAll(".btn-copy-doa-card");
   copyButtons.forEach((button) => {
     button.addEventListener("click", async (e) => {
-      const content = e.currentTarget.getAttribute("data-content");
-      const id = e.currentTarget.getAttribute("data-id");
+      // Save button reference BEFORE async operation
+      const button = e.currentTarget;
+      const content = button.getAttribute("data-content");
+      const id = button.getAttribute("data-id");
+      const originalHTML = button.innerHTML;
 
       try {
         // Decode HTML entities
@@ -108,15 +111,14 @@ function attachCopyListeners(containerId) {
         await navigator.clipboard.writeText(decodedContent);
 
         // Show success feedback
-        const originalHTML = e.currentTarget.innerHTML;
-        e.currentTarget.innerHTML = '<i class="bi bi-check"></i> Tersalin!';
-        e.currentTarget.classList.add("btn-success");
-        e.currentTarget.classList.remove("btn-outline-primary");
+        button.innerHTML = '<i class="bi bi-check"></i> Tersalin!';
+        button.classList.add("btn-success");
+        button.classList.remove("btn-outline-primary");
 
         setTimeout(() => {
-          e.currentTarget.innerHTML = originalHTML;
-          e.currentTarget.classList.remove("btn-success");
-          e.currentTarget.classList.add("btn-outline-primary");
+          button.innerHTML = originalHTML;
+          button.classList.remove("btn-success");
+          button.classList.add("btn-outline-primary");
         }, 2000);
 
         console.log(`[DoaHaditsCard] Content copied for ID: ${id}`);
