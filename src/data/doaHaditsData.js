@@ -105,7 +105,7 @@ export const doaHaditsData = [
       "إِذَا تَزَوَّجَ الْعَبْدُ فَقَدِ اسْتَكْمَلَ نِصْفَ الدِّينِ فَلْيَتَّقِ اللَّهَ فِي النِّصْفِ الْبَاقِي",
     translation:
       "Jika seorang hamba menikah, maka ia telah menyempurnakan setengah agamanya. Maka bertakwalah kepada Allah pada setengah sisanya.",
-    source: "HR. Baihaqi",
+    source: "HR. Al-Baihaqi dalam Syu'abul Iman no. 5486, Al-Hakim no. 2681",
   },
   {
     id: "HK-02",

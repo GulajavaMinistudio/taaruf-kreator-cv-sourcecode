@@ -17,7 +17,7 @@ function renderDoaView() {
   container.innerHTML = `
     <!-- Hero Card with Background Image -->
     <div class="card mb-4 overflow-hidden border-0 shadow">
-      <div class="position-relative" style="height: 250px; background: linear-gradient(rgba(161, 29, 51, 0.7), rgba(100, 18, 32, 0.85)), url('/home_page_doa_cover.jpg') center/cover; background-size: cover; background-position: center;">
+      <div class="position-relative" style="height: 250px; background: linear-gradient(rgba(161, 29, 51, 0.5), rgba(100, 18, 32, 0.65)), url('/home_page_doa_cover.jpg') center/cover; background-size: cover; background-position: center;">
         <div class="position-absolute top-50 start-50 translate-middle text-center text-white w-100 px-3">
           <h1 class="display-5 fw-bold mb-3">
             <i class="bi bi-book"></i> Doa & Hadits Pernikahan
