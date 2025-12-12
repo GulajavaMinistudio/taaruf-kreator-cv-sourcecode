@@ -8,6 +8,7 @@
 import { navigateTo } from "../router/router.js";
 import { generateCV } from "../services/cvGeneratorService.js";
 import { showToast } from "../components/ToastNotification.js";
+import { STORAGE_KEYS } from "../types/enums.js";
 
 /**
  * Render Preview Page content
@@ -18,8 +19,8 @@ function renderPreviewView() {
   // Load form data from sessionStorage
   const formData = loadFormData();
 
-  // If no data, redirect to form
-  if (!formData) {
+  // If no data (empty object), redirect to form
+  if (Object.keys(formData).length === 0) {
     showToast(
       "Tidak ada data untuk di-preview. Silakan isi formulir terlebih dahulu.",
       "warning"
@@ -74,18 +75,16 @@ function renderPreviewView() {
 
 /**
  * Load form data from sessionStorage
- * @returns {Object|null} Form data or null if not found
+ * Returns empty object (Null Object Pattern) instead of null to prevent null checks
+ * @returns {Object} Form data or empty object if not found
  */
 function loadFormData() {
   try {
-    const dataStr = sessionStorage.getItem("taaruf_cv_temp_data");
-    if (!dataStr) {
-      return null;
-    }
-    return JSON.parse(dataStr);
+    const dataStr = sessionStorage.getItem(STORAGE_KEYS.TEMP_DATA);
+    return dataStr ? JSON.parse(dataStr) : {};
   } catch (error) {
     console.error("[PreviewView] Error loading form data:", error);
-    return null;
+    return {};
   }
 }
 

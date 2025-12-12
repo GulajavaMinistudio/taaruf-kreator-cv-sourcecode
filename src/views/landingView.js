@@ -17,7 +17,6 @@ function renderLandingView() {
     <!-- Hero Section -->
     <div class="hero-section">
       <h1>
-        <i class="bi bi-heart"></i>
         Taaruf CV Kreator
       </h1>
       <p class="lead">Buat CV Ta'aruf Islami dengan Mudah dan Aman</p>

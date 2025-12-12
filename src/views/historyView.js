@@ -16,6 +16,8 @@ import {
   setButtonLoading,
   resetButtonLoading,
 } from "../components/LoadingSpinner.js";
+import { formatDateTime } from "../utils/dateUtils.js";
+import { STORAGE_KEYS } from "../types/enums.js";
 
 /**
  * Render History Page content
@@ -136,7 +138,7 @@ function renderHistoryList(container, history) {
             <h5 class="mb-1">${item.name || "CV Ta'aruf"}</h5>
             <p class="mb-1 text-muted small">
               <i class="bi bi-calendar"></i> 
-              Dibuat: ${new Date(item.generatedAt).toLocaleString("id-ID")}
+              Dibuat: ${formatDateTime(item.generatedAt)}
             </p>
             ${
               item.sourceData && item.sourceData.namaLengkap
@@ -215,10 +217,9 @@ function handleViewHistory(historyId) {
 /**
  * Handle copy history button click (direct copy without modal)
  * @param {string} historyId - History ID to copy
- * @param {Event} event - Click event
+ * @param {HTMLElement} button - The clicked button element
  */
-async function handleCopyHistory(historyId, event) {
-  const button = event?.currentTarget;
+async function handleCopyHistory(historyId, button) {
   const item = getHistoryById(historyId);
 
   if (!item) {
@@ -268,10 +269,9 @@ async function handleCopyHistory(historyId, event) {
 /**
  * Handle delete history button click
  * @param {string} historyId - History ID to delete
- * @param {Event} event - Click event
+ * @param {HTMLElement} button - The clicked button element
  */
-function handleDeleteHistory(historyId, event) {
-  const button = event?.currentTarget;
+function handleDeleteHistory(historyId, button) {
   const item = getHistoryById(historyId);
 
   if (!item) {
@@ -325,41 +325,54 @@ async function handleModalCopy() {
 }
 
 /**
- * Attach event listeners for history actions
+ * Attach event listeners using Event Delegation (single listener on container)
+ * Better performance for large lists, follows Eloquent JS patterns
  */
 function attachHistoryListeners() {
-  // View history buttons
-  const viewButtons = document.querySelectorAll(".btn-view-history");
-  viewButtons.forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const historyId = e.currentTarget.getAttribute("data-id");
+  const container = document.getElementById("history-list-container");
+
+  if (!container) return;
+
+  // Single event listener on container using Event Delegation
+  container.addEventListener("click", (e) => {
+    // Check if clicked element is "View History" button
+    const viewBtn = e.target.closest(".btn-view-history");
+    if (viewBtn) {
+      const historyId = viewBtn.getAttribute("data-id");
       handleViewHistory(historyId);
-    });
+      return;
+    }
+
+    // Check if clicked element is "Copy History" button
+    const copyBtn = e.target.closest(".btn-copy-history");
+    if (copyBtn) {
+      const historyId = copyBtn.getAttribute("data-id");
+      handleCopyHistory(historyId, copyBtn);
+      return;
+    }
+
+    // Check if clicked element is "Delete History" button
+    const deleteBtn = e.target.closest(".btn-delete-history");
+    if (deleteBtn) {
+      const historyId = deleteBtn.getAttribute("data-id");
+      handleDeleteHistory(historyId, deleteBtn);
+      return;
+    }
   });
 
-  // Copy history buttons
-  const copyButtons = document.querySelectorAll(".btn-copy-history");
-  copyButtons.forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const historyId = e.currentTarget.getAttribute("data-id");
-      handleCopyHistory(historyId, e);
-    });
-  });
-
-  // Delete history buttons
-  const deleteButtons = document.querySelectorAll(".btn-delete-history");
-  deleteButtons.forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const historyId = e.currentTarget.getAttribute("data-id");
-      handleDeleteHistory(historyId, e);
-    });
-  });
-
-  // Modal copy button
+  // Modal copy button (separate listener, not delegated)
   const btnModalCopy = document.getElementById("btn-modal-copy");
   if (btnModalCopy) {
     btnModalCopy.addEventListener("click", handleModalCopy);
   }
+
+  // Initialize Bootstrap tooltips on container
+  const tooltipTriggerList = [].slice.call(
+    container.querySelectorAll('[data-bs-toggle="tooltip"]')
+  );
+  tooltipTriggerList.forEach((tooltipTriggerEl) => {
+    new bootstrap.Tooltip(tooltipTriggerEl);
+  });
 }
 
 /**

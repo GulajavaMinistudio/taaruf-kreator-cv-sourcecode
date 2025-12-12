@@ -16,6 +16,8 @@ import {
   setButtonLoading,
   resetButtonLoading,
 } from "../components/LoadingSpinner.js";
+import { formatDateTime } from "../utils/dateUtils.js";
+import { STORAGE_KEYS } from "../types/enums.js";
 
 /**
  * Render Draft Page content
@@ -114,9 +116,7 @@ function renderDraftList(container, drafts) {
             <h5 class="mb-1">${draft.name || "Draft Tanpa Nama"}</h5>
             <p class="mb-1 text-muted small">
               <i class="bi bi-clock"></i> 
-              Terakhir diupdate: ${new Date(draft.lastUpdated).toLocaleString(
-                "id-ID"
-              )}
+              Terakhir diupdate: ${formatDateTime(draft.lastUpdated)}
             </p>
             ${
               draft.data.namaLengkap
@@ -159,9 +159,9 @@ function renderDraftList(container, drafts) {
 /**
  * Handle load draft button click
  * @param {string} draftId - Draft ID to load
+ * @param {HTMLElement} button - The clicked button element
  */
-function handleLoadDraft(draftId, event) {
-  const button = event?.target;
+function handleLoadDraft(draftId, button) {
   const draft = getDraftById(draftId);
 
   if (!draft) {
@@ -176,7 +176,7 @@ function handleLoadDraft(draftId, event) {
   setTimeout(() => {
     // Store draft data in sessionStorage for form to load
     sessionStorage.setItem(
-      "taaruf_cv_draft_to_load",
+      STORAGE_KEYS.DRAFT_TO_LOAD,
       JSON.stringify(draft.data)
     );
 
@@ -223,25 +223,39 @@ function handleDeleteDraft(draftId) {
 }
 
 /**
- * Attach event listeners for draft actions
+ * Attach event listeners using Event Delegation (single listener on container)
+ * Better performance for large lists, follows Eloquent JS patterns
  */
 function attachDraftListeners() {
-  // Load draft buttons
-  const loadButtons = document.querySelectorAll(".btn-load-draft");
-  loadButtons.forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const draftId = e.currentTarget.getAttribute("data-id");
-      handleLoadDraft(draftId, e);
-    });
+  const container = document.getElementById("draft-list-container");
+
+  if (!container) return;
+
+  // Single event listener on container using Event Delegation
+  container.addEventListener("click", (e) => {
+    // Check if clicked element is "Load Draft" button
+    const loadBtn = e.target.closest(".btn-load-draft");
+    if (loadBtn) {
+      const draftId = loadBtn.getAttribute("data-id");
+      handleLoadDraft(draftId, loadBtn);
+      return;
+    }
+
+    // Check if clicked element is "Delete Draft" button
+    const deleteBtn = e.target.closest(".btn-delete-draft");
+    if (deleteBtn) {
+      const draftId = deleteBtn.getAttribute("data-id");
+      handleDeleteDraft(draftId);
+      return;
+    }
   });
 
-  // Delete draft buttons
-  const deleteButtons = document.querySelectorAll(".btn-delete-draft");
-  deleteButtons.forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const draftId = e.currentTarget.getAttribute("data-id");
-      handleDeleteDraft(draftId);
-    });
+  // Initialize Bootstrap tooltips on container
+  const tooltipTriggerList = [].slice.call(
+    container.querySelectorAll('[data-bs-toggle="tooltip"]')
+  );
+  tooltipTriggerList.forEach((tooltipTriggerEl) => {
+    new bootstrap.Tooltip(tooltipTriggerEl);
   });
 }
 

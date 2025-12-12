@@ -1,9 +1,20 @@
 /**
  * @file DoaHaditsCard.js
  * @description Reusable card component for displaying doa and hadits
- * @version 1.0
- * @date 2025-12-08
+ * @version 1.1
+ * @date 2025-12-12
+ * @changelog
+ * - v1.1: Refactored to use const arrow functions and extracted constants (Clean Code compliance)
+ * - v1.0: Initial release
  */
+
+// ===== CONSTANTS =====
+const CARD_CLASS = "doa-card";
+const COPY_BUTTON_CLASS = "btn-copy-doa-card";
+const COPY_SUCCESS_DURATION = 2000;
+const CARD_CATEGORY_ATTR = "data-category";
+const CARD_ID_ATTR = "data-id";
+const BUTTON_CONTENT_ATTR = "data-content";
 
 /**
  * Create doa/hadits card HTML
@@ -16,7 +27,7 @@
  * @param {string} [data.category] - Category
  * @returns {string} HTML string for the card
  */
-function createDoaHaditsCard(data) {
+const createDoaHaditsCard = (data) => {
   const { id, title, arabic, translation, source, category = "" } = data;
 
   // Escape HTML to prevent XSS
@@ -30,7 +41,7 @@ function createDoaHaditsCard(data) {
   const safeFullContent = escapeHtml(fullContent);
 
   return `
-    <div class="card doa-card" data-id="${id}" data-category="${category}">
+    <div class="${CARD_CLASS}" ${CARD_ID_ATTR}="${id}" ${CARD_CATEGORY_ATTR}="${category}">
       <div class="card-header">
         <h5 class="card-title mb-0">${safeTitle}</h5>
       </div>
@@ -46,16 +57,16 @@ function createDoaHaditsCard(data) {
       </div>
       <div class="card-footer">
         <button 
-          class="btn btn-outline-primary btn-sm btn-copy-doa-card" 
-          data-content="${safeFullContent}"
-          data-id="${id}"
+          class="btn btn-outline-primary btn-sm ${COPY_BUTTON_CLASS}" 
+          ${BUTTON_CONTENT_ATTR}="${safeFullContent}"
+          ${CARD_ID_ATTR}="${id}"
         >
           <i class="bi bi-clipboard"></i> Copy
         </button>
       </div>
     </div>
   `;
-}
+};
 
 /**
  * Render multiple doa/hadits cards to a container
@@ -63,7 +74,7 @@ function createDoaHaditsCard(data) {
  * @param {Array<Object>} items - Array of doa/hadits objects
  * @returns {void}
  */
-function renderDoaHaditsCards(containerId, items) {
+const renderDoaHaditsCards = (containerId, items) => {
   const container = document.getElementById(containerId);
   if (!container) {
     console.error(`[DoaHaditsCard] Container #${containerId} not found`);
@@ -86,17 +97,17 @@ function renderDoaHaditsCards(containerId, items) {
 
   // Attach copy event listeners
   attachCopyListeners(containerId);
-}
+};
 
 /**
  * Attach copy button event listeners
  * @param {string} containerId - Container element ID
  */
-function attachCopyListeners(containerId) {
+const attachCopyListeners = (containerId) => {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  const copyButtons = container.querySelectorAll(".btn-copy-doa-card");
+  const copyButtons = container.querySelectorAll(`.${COPY_BUTTON_CLASS}`);
   copyButtons.forEach((button) => {
     button.addEventListener("click", async (e) => {
       // Save button reference BEFORE async operation
@@ -119,7 +130,7 @@ function attachCopyListeners(containerId) {
           button.innerHTML = originalHTML;
           button.classList.remove("btn-success");
           button.classList.add("btn-outline-primary");
-        }, 2000);
+        }, COPY_SUCCESS_DURATION);
 
         console.log(`[DoaHaditsCard] Content copied for ID: ${id}`);
       } catch (err) {
@@ -128,28 +139,28 @@ function attachCopyListeners(containerId) {
       }
     });
   });
-}
+};
 
 /**
  * Escape HTML special characters
  * @param {string} text - Text to escape
  * @returns {string} Escaped text
  */
-function escapeHtml(text) {
+const escapeHtml = (text) => {
   const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
-}
+};
 
 /**
  * Decode HTML entities
  * @param {string} html - HTML string with entities
  * @returns {string} Decoded text
  */
-function decodeHtml(html) {
+const decodeHtml = (html) => {
   const txt = document.createElement("textarea");
   txt.innerHTML = html;
   return txt.value;
-}
+};
 
 export { createDoaHaditsCard, renderDoaHaditsCards, attachCopyListeners };

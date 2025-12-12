@@ -3,6 +3,13 @@
  * Generate unique IDs for Draft and History objects
  */
 
+// Constants for ID generation
+const RANDOM_STRING_BASE = 36;
+const RANDOM_STRING_START_INDEX = 2;
+const RANDOM_STRING_END_INDEX = 6;
+const RANDOM_STRING_LENGTH =
+  RANDOM_STRING_END_INDEX - RANDOM_STRING_START_INDEX; // 4 characters
+
 /**
  * Generate UUID v4 (RFC 4122 compliant)
  * @returns {string} UUID v4 string
@@ -15,12 +22,27 @@ export function generateUUID() {
     return crypto.randomUUID();
   }
 
-  // Fallback for older browsers
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+  // Secure fallback using crypto.getRandomValues for older browsers
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+
+    // Set version (4) and variant (10) bits per RFC 4122
+    bytes[6] = (bytes[6] & 0x0f) | 0x40; // Version 4
+    bytes[8] = (bytes[8] & 0x3f) | 0x80; // Variant 10
+
+    // Convert to hex string with proper UUID format
+    const hex = Array.from(bytes, (byte) =>
+      byte.toString(16).padStart(2, "0")
+    ).join("");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(
+      12,
+      16
+    )}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+
+  // Last resort fallback (should never happen in modern environments)
+  throw new Error("Crypto API not available. Cannot generate secure UUID.");
 }
 
 /**
@@ -33,7 +55,9 @@ export function generateUUID() {
  */
 export function generateTimestampId(prefix = "id") {
   const timestamp = Date.now();
-  const random = Math.random().toString(36).substring(2, 6);
+  const random = Math.random()
+    .toString(RANDOM_STRING_BASE)
+    .substring(RANDOM_STRING_START_INDEX, RANDOM_STRING_END_INDEX);
   return `${prefix}_${timestamp}_${random}`;
 }
 
@@ -99,8 +123,8 @@ export function isValidTimestampId(id, expectedPrefix = null) {
   const ts = parseInt(timestamp, 10);
   if (isNaN(ts) || ts <= 0) return false;
 
-  // Check random part exists and has reasonable length
-  if (!random || random.length < 3) return false;
+  // Check random part exists and has expected length
+  if (!random || random.length !== RANDOM_STRING_LENGTH) return false;
 
   return true;
 }

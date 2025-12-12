@@ -8,6 +8,7 @@
 import { navigateTo } from "../router/router.js";
 import { showToast } from "../components/ToastNotification.js";
 import { saveHistory } from "../services/localStorageService.js";
+import { STORAGE_KEYS } from "../types/enums.js";
 
 /**
  * Render Result Page content
@@ -16,7 +17,7 @@ function renderResultView() {
   const container = document.getElementById("view-result");
 
   // Load generated CV text from sessionStorage
-  const cvText = sessionStorage.getItem("taaruf_cv_generated_text");
+  const cvText = sessionStorage.getItem(STORAGE_KEYS.GENERATED_TEXT);
 
   // If no CV text, redirect to form
   if (!cvText) {
@@ -142,8 +143,8 @@ async function handleCopyToClipboard() {
  * Handle save to history
  */
 function handleSaveHistory() {
-  const cvText = sessionStorage.getItem("taaruf_cv_generated_text");
-  const sourceDataStr = sessionStorage.getItem("taaruf_cv_source_data");
+  const cvText = sessionStorage.getItem(STORAGE_KEYS.GENERATED_TEXT);
+  const sourceDataStr = sessionStorage.getItem(STORAGE_KEYS.SOURCE_DATA);
 
   if (!cvText || !sourceDataStr) {
     showToast(
@@ -183,7 +184,7 @@ function handleSaveHistory() {
  * Handle print CV
  */
 function handlePrintCV() {
-  const cvText = sessionStorage.getItem("taaruf_cv_generated_text");
+  const cvText = sessionStorage.getItem(STORAGE_KEYS.GENERATED_TEXT);
 
   if (!cvText) {
     showToast("Tidak ada CV untuk dicetak.", "error");
@@ -229,9 +230,9 @@ function handlePrintCV() {
  */
 function handleNewCV() {
   // Clear sessionStorage
-  sessionStorage.removeItem("taaruf_cv_temp_data");
-  sessionStorage.removeItem("taaruf_cv_generated_text");
-  sessionStorage.removeItem("taaruf_cv_source_data");
+  sessionStorage.removeItem(STORAGE_KEYS.TEMP_DATA);
+  sessionStorage.removeItem(STORAGE_KEYS.GENERATED_TEXT);
+  sessionStorage.removeItem(STORAGE_KEYS.SOURCE_DATA);
 
   // Navigate to form
   showToast("Membuat CV baru. Silakan isi formulir.", "info");
@@ -285,7 +286,7 @@ function initResultView() {
 
   // Clear temporary form data after CV is generated
   // This prevents conflicts when loading drafts later
-  sessionStorage.removeItem("taaruf_cv_temp_data");
+  sessionStorage.removeItem(STORAGE_KEYS.TEMP_DATA);
   console.log("[ResultView] Cleared temporary form data");
 }
 

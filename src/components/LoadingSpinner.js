@@ -1,9 +1,19 @@
 /**
  * @file LoadingSpinner.js
  * @description Loading Spinner Component for async operations
- * @version 1.0
- * @date 2025-01-27
+ * @version 1.1
+ * @date 2025-12-12
+ * @changelog
+ * - v1.1: Extracted magic strings to constants (Clean Code compliance)
+ * - v1.0: Initial release
  */
+
+// ===== CONSTANTS =====
+const SPINNER_OVERLAY_ID = "loading-spinner-overlay";
+const SPINNER_SIZE_SM = "spinner-border-sm";
+const INLINE_SPINNER_CLASS = "inline-spinner";
+const DATA_ATTR_ORIGINAL_CONTENT = "originalContent";
+const DATA_ATTR_ORIGINAL_DISABLED = "originalDisabled";
 
 /**
  * Show loading spinner overlay
@@ -14,7 +24,7 @@ export function showLoadingSpinner(message = "Memproses...") {
   hideLoadingSpinner();
 
   const spinnerHTML = `
-    <div id="loading-spinner-overlay" class="loading-spinner-overlay">
+    <div id="${SPINNER_OVERLAY_ID}" class="loading-spinner-overlay">
       <div class="loading-spinner-content">
         <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
           <span class="visually-hidden">Loading...</span>
@@ -31,7 +41,7 @@ export function showLoadingSpinner(message = "Memproses...") {
  * Hide loading spinner overlay
  */
 export function hideLoadingSpinner() {
-  const spinner = document.getElementById("loading-spinner-overlay");
+  const spinner = document.getElementById(SPINNER_OVERLAY_ID);
   if (spinner) {
     spinner.remove();
   }
@@ -45,9 +55,9 @@ export function hideLoadingSpinner() {
 export function showInlineSpinner(element, size = "md") {
   if (!element) return;
 
-  const sizeClass = size === "sm" ? "spinner-border-sm" : "";
+  const sizeClass = size === "sm" ? SPINNER_SIZE_SM : "";
   const spinnerHTML = `
-    <div class="inline-spinner text-center py-3">
+    <div class="${INLINE_SPINNER_CLASS} text-center py-3">
       <div class="spinner-border text-primary ${sizeClass}" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
@@ -66,13 +76,13 @@ export function setButtonLoading(button, loadingText = "Memproses...") {
   if (!button) return;
 
   // Store original content
-  button.dataset.originalContent = button.innerHTML;
-  button.dataset.originalDisabled = button.disabled;
+  button.dataset[DATA_ATTR_ORIGINAL_CONTENT] = button.innerHTML;
+  button.dataset[DATA_ATTR_ORIGINAL_DISABLED] = button.disabled;
 
   // Set loading state
   button.disabled = true;
   button.innerHTML = `
-    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+    <span class="spinner-border ${SPINNER_SIZE_SM} me-2" role="status" aria-hidden="true"></span>
     ${loadingText}
   `;
 }
@@ -85,15 +95,15 @@ export function resetButtonLoading(button) {
   if (!button) return;
 
   // Restore original content
-  if (button.dataset.originalContent) {
-    button.innerHTML = button.dataset.originalContent;
-    delete button.dataset.originalContent;
+  if (button.dataset[DATA_ATTR_ORIGINAL_CONTENT]) {
+    button.innerHTML = button.dataset[DATA_ATTR_ORIGINAL_CONTENT];
+    delete button.dataset[DATA_ATTR_ORIGINAL_CONTENT];
   }
 
   // Restore disabled state
-  if (button.dataset.originalDisabled !== undefined) {
-    button.disabled = button.dataset.originalDisabled === "true";
-    delete button.dataset.originalDisabled;
+  if (button.dataset[DATA_ATTR_ORIGINAL_DISABLED] !== undefined) {
+    button.disabled = button.dataset[DATA_ATTR_ORIGINAL_DISABLED] === "true";
+    delete button.dataset[DATA_ATTR_ORIGINAL_DISABLED];
   } else {
     button.disabled = false;
   }

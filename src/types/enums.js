@@ -157,6 +157,23 @@ export function getEnumValues(enumObject) {
 }
 
 /**
+ * SessionStorage Keys
+ * Sesuai dengan architectural pattern untuk central key management
+ * @readonly
+ * @enum {string}
+ */
+export const STORAGE_KEYS = {
+  // Temporary form data (in preview/result flow)
+  TEMP_DATA: "taaruf_cv_temp_data",
+  // Draft loading indicator
+  DRAFT_TO_LOAD: "taaruf_cv_draft_to_load",
+  // Generated CV text output
+  GENERATED_TEXT: "taaruf_cv_generated_text",
+  // Source data for history saving
+  SOURCE_DATA: "taaruf_cv_source_data",
+};
+
+/**
  * Check if a value is valid for a given enum
  * @param {Object} enumObject - The enum object
  * @param {string} value - The value to check

@@ -22,6 +22,7 @@ import {
   setButtonLoading,
   resetButtonLoading,
 } from "../components/LoadingSpinner.js";
+import { STORAGE_KEYS } from "../types/enums.js";
 
 /**
  * Render Form Page content (skeleton structure)
@@ -1270,7 +1271,7 @@ function handleFormSubmit() {
 
   // Save to sessionStorage for preview page
   try {
-    sessionStorage.setItem("taaruf_cv_temp_data", JSON.stringify(formData));
+    sessionStorage.setItem(STORAGE_KEYS.TEMP_DATA, JSON.stringify(formData));
     console.log("[FormView] Form data saved to sessionStorage");
 
     // Navigate to preview page
@@ -1316,7 +1317,7 @@ function initFormView() {
   }
 
   // Priority 1: Check if there's a draft to load from Draft page (explicit user action)
-  const draftToLoad = sessionStorage.getItem("taaruf_cv_draft_to_load");
+  const draftToLoad = sessionStorage.getItem(STORAGE_KEYS.DRAFT_TO_LOAD);
   if (draftToLoad) {
     try {
       const draftData = JSON.parse(draftToLoad);
@@ -1325,7 +1326,7 @@ function initFormView() {
       setTimeout(() => {
         loadDraftToForm(draftData);
         // Clear sessionStorage after loading
-        sessionStorage.removeItem("taaruf_cv_draft_to_load");
+        sessionStorage.removeItem(STORAGE_KEYS.DRAFT_TO_LOAD);
         console.log("[FormView] Draft loaded from Draft page");
       }, 100);
 
@@ -1339,7 +1340,7 @@ function initFormView() {
   }
 
   // Priority 2: Check if there's temporary data from Preview page (auto-restore)
-  const tempData = sessionStorage.getItem("taaruf_cv_temp_data");
+  const tempData = sessionStorage.getItem(STORAGE_KEYS.TEMP_DATA);
   if (tempData) {
     try {
       const formData = JSON.parse(tempData);
@@ -1348,7 +1349,7 @@ function initFormView() {
       setTimeout(() => {
         loadDraftToForm(formData);
         // Clear temp data after restoring to prevent conflicts
-        sessionStorage.removeItem("taaruf_cv_temp_data");
+        sessionStorage.removeItem(STORAGE_KEYS.TEMP_DATA);
         console.log(
           "[FormView] Restored data from preview (temp data cleared)"
         );
