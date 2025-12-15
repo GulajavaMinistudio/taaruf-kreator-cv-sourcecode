@@ -1,190 +1,141 @@
 # Taaruf CV Kreator
 
-Aplikasi pembuat CV Ta'aruf untuk Muslim dan Muslimah yang mengutamakan privasi data.
+![Logo Taaruf CV Kreator](public/wedding-rings.png)
 
-## 📋 Status Pengembangan
+## Buat CV Taaruf Syar'i dengan Privasi Terjaga
 
-### ✅ Phase 1: Data Layer - **COMPLETED** (07 Des 2025)
-
-**Checklist:**
-- ✅ Project Setup (Vite + Bootstrap 5)
-- ✅ Data Types & Enums (13 enums, 4 types)
-- ✅ LocalStorage Service (15+ methods)
-- ✅ Test Suite (9 test cases)
-
-**Files Created:** 11 files (~1,705 LOC)
-
-### ✅ Phase 2: UI Skeleton & Routing - **COMPLETED** (08 Des 2025)
-
-**Checklist:**
-- ✅ Hash-based Router (8 routes)
-- ✅ Main Layout & Navbar (responsive)
-- ✅ 8 View Implementations (Landing, Form, Preview, Result, Draft, History, Doa, Settings)
-- ✅ 3 Shared Components (Modal, Toast, DoaCard)
-- ✅ Doa & Hadits Content (13 items in 5 categories)
-- ✅ Testing & Verification (10/10 passed)
-
-**Files Created:** 14 files (~2,400 LOC)  
-**Files Modified:** 3 files (index.html, main.js, style.css)
-
-### 🔄 Phase 3: Form Implementation & Validation - **PLANNED**
-
-**Estimated:** 6-8 hours  
-**Tasks:** 49 form fields, validation logic, conditional fields, save draft
-
-### 🔄 Phase 4: CV Generator Logic - **PLANNED**
-
-**Estimated:** 4-5 hours  
-**Tasks:** Generator service, text template, field mapping
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js v18+ dan npm
-- Modern browser dengan localStorage support
-
-### Installation
-
-```bash
-# Clone repository
-git clone [repository-url]
-cd taaruf-cv-kreator
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-### Development
-
-```bash
-# Start dev server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-```
-
-## 🧪 Testing
-
-### Phase 2 Testing (Current)
-
-1. Jalankan dev server: `npm run dev`
-2. Buka browser ke `http://localhost:5173`
-3. Test navigasi antar halaman menggunakan navbar
-4. Test direct URL hash (contoh: `http://localhost:5173/#/doa`)
-5. Test responsive design (resize browser window)
-6. Verifikasi semua konten doa/hadits muncul dengan benar
-
-### Phase 1 Testing
-
-1. Buka browser console (F12)
-2. Jalankan: `await runAllTests()`
-3. Verifikasi: `✅ Passed: 9/9`
-
-## 📚 Documentation
-
-### Project Structure
-
-```
-taaruf-cv-kreator/
-├── docs/                                # Documentation
-│   ├── implementation-roadmap.md        # Implementation guide
-│   ├── phase-1-report.md                # Phase 1 report
-│   └── phase-2-report.md                # Phase 2 report
-├── plan/                                # Implementation plans
-│   ├── feature-data-layer-1.md          # Phase 1 plan
-│   └── feature-ui-routing-2.md          # Phase 2 plan
-├── spec/                                # Technical specifications
-│   ├── spec-data-localstorage-schema.md
-│   ├── spec-design-component-architecture.md
-│   ├── spec-design-form-validation.md
-│   └── spec-design-cv-generator.md
-├── src/
-│   ├── router/                          # SPA routing system
-│   ├── views/                           # Page views (8 views)
-│   ├── components/                      # Reusable UI components
-│   ├── data/                            # Static data (doa/hadits)
-│   ├── services/                        # Business logic services
-│   ├── types/                           # Type definitions & enums
-│   ├── utils/                           # Utility functions
-│   └── assets/                          # Static assets
-│   ├── main.js                     # Application entry point
-│   └── style.css                   # Custom styles
-├── index.html                      # HTML entry
-├── vite.config.js                  # Vite configuration
-└── package.json                    # Project dependencies
-```
-
-### LocalStorage Keys
-
-| Key                  | Description               | Type                   |
-| -------------------- | ------------------------- | ---------------------- |
-| `taaruf_cv_drafts`   | Draft CV yang disimpan    | `Array<DraftObject>`   |
-| `taaruf_cv_history`  | CV yang sudah di-generate | `Array<HistoryObject>` |
-| `taaruf_cv_settings` | Pengaturan aplikasi       | `SettingsObject`       |
-
-### API Usage Examples
-
-```javascript
-import * as StorageService from './services/localStorageService.js';
-
-// Save a draft
-const result = StorageService.saveDraft({
-  namaLengkap: 'Ahmad Fauzi',
-  jenisKelamin: 'Laki-laki',
-  // ... other fields
-}, 'My Draft Name');
-
-// Get all drafts
-const drafts = StorageService.getDrafts();
-
-// Get a specific draft
-const draft = StorageService.getDraftById(draftId);
-
-// Update a draft
-StorageService.updateDraft(draftId, updatedData);
-
-// Delete a draft
-StorageService.deleteDraft(draftId);
-
-// Save to history
-StorageService.saveHistory(formData, cvTextContent, 'CV Name');
-
-// Clear all data
-StorageService.clearAllData();
-```
-
-## 🔒 Privacy & Security
-
-- ✅ **100% Client-Side**: Semua data diproses di browser
-- ✅ **No Server Storage**: Tidak ada data yang dikirim ke server
-- ✅ **LocalStorage Only**: Data tersimpan di browser pengguna
-- ✅ **No Analytics**: Tidak ada tracking atau analytics
-
-## 🛠️ Tech Stack
-
-- **Build Tool**: Vite v7.2.6
-- **Framework**: Vanilla JavaScript (ES6+)
-- **CSS Framework**: Bootstrap 5
-- **Storage**: Browser LocalStorage API
-- **Module System**: ES Modules
-
-## 📄 License
-
-Proprietary - Gulajava Ministudio © 2025
-
-## 👨‍💻 Developer
-
-**Gulajava Ministudio**
+Platform pembuatan CV Taaruf yang aman, privat, dan mudah digunakan.
 
 ---
 
-**Version**: 1.5  
-**Last Updated**: 07 Desember 2025
+**Taaruf CV Kreator** adalah aplikasi web modern yang didedikasikan untuk
+membantu Muslim dan Muslimah menyusun Curriculum Vitae (CV) taaruf yang rapi,
+terstruktur, dan sesuai syariat.
+
+## Privasi Adalah Prioritas Kami
+
+Kami memahami bahwa data taaruf adalah privasi yang sangat sensitif. Aplikasi
+ini dibangun dengan pendekatan **Privacy-First**: seluruh data Anda diproses
+dan disimpan secara lokal di browser perangkat Anda. **Tidak ada data yang
+dikirim ke server kami.**
+
+## Fitur Unggulan
+
+- 🔒 **Privasi Mutlak (Client-Side Only)** -
+  Arsitektur aplikasi menjamin data Anda tetap berada di perangkat Anda.
+  Menggunakan teknologi LocalStorage untuk penyimpanan data.
+
+- 📄 **Format Standar Taaruf** -
+  Template CV yang telah disesuaikan dengan standar umum proses taaruf,
+  mencakup data diri, kriteria pasangan, visi misi pernikahan,
+  hingga riwayat pendidikan.
+
+- 💾 **Simpan & Lanjut Nanti** -
+  Fitur *Auto-Save* dan *Draft* memungkinkan Anda mengisi formulir panjang
+  secara bertahap tanpa takut kehilangan data.
+
+- 🎨 **Tampilan Modern & Responsif** -
+  Antarmuka yang bersih dengan tema *Burgundy & Amber* yang elegan,
+  nyaman diakses baik melalui Desktop, Tablet, maupun Smartphone.
+
+- 📚 **Suplemen Ibadah** -
+  Dilengkapi dengan fitur Doa & Hadits pilihan seputar pernikahan
+  sebagai bekal spiritual dalam proses taaruf.
+
+- 📤 **Ekspor Mudah** -
+  Generate CV Anda ke format yang siap dibagikan kepada perantara
+  (murabbi/ustadz) dengan satu klik.
+
+## Teknologi
+
+Project ini dikembangkan dengan standar *Clean Code* dan *Clean Architecture*
+untuk memastikan performa dan kemudahan pengembangan:
+
+- **Core:** Vanilla JavaScript (ES6+)
+- **UI Framework:** Bootstrap 5
+- **Build Tool:** Vite
+- **Architecture:** MVC (Model-View-Controller)
+- **Storage:** Browser LocalStorage API
+
+## Panduan Memulai
+
+Ikuti langkah-langkah berikut untuk menjalankan aplikasi di komputer lokal
+Anda.
+
+### Prasyarat
+
+Pastikan Anda telah menginstal:
+
+- [Node.js](https://nodejs.org/) (versi 18 atau lebih baru)
+- npm (Node Package Manager)
+
+### Instalasi
+
+1. **Clone repository**
+
+   ```bash
+   git clone https://github.com/username/taaruf-cv-kreator.git
+   cd taaruf-cv-kreator
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Jalankan mode pengembangan**
+
+   ```bash
+   npm run dev
+   ```
+
+   Aplikasi akan dapat diakses di `http://localhost:5173`.
+
+4. **Build untuk production**
+
+   ```bash
+   npm run build
+   ```
+
+## Struktur Project
+
+Gambaran singkat struktur direktori project:
+
+```text
+taaruf-cv-kreator/
+├── docs/               # Dokumentasi lengkap & laporan fase
+├── plan/               # Rencana pengembangan fitur
+├── spec/               # Spesifikasi teknis & desain sistem
+├── src/
+│   ├── components/     # Komponen UI (Modal, Toast, Cards)
+│   ├── data/           # Data statis (Doa, Hadits)
+│   ├── router/         # Sistem routing aplikasi
+│   ├── services/       # Logika bisnis (Storage, Generator, Validasi)
+│   ├── utils/          # Fungsi utilitas (Date, ID, Formatting)
+│   ├── views/          # Halaman/View aplikasi
+│   └── main.js         # Entry point
+└── index.html          # File utama HTML
+```
+
+## Status Pengembangan
+
+Saat ini project telah menyelesaikan **Fase 5** (Feature Integration & Testing).
+
+| Fase       | Deskripsi                        | Status    |
+| :--------- | :------------------------------- | :-------- |
+| **Fase 1** | Data Layer & Storage Service     | ✅ Selesai |
+| **Fase 2** | UI Skeleton & Routing            | ✅ Selesai |
+| **Fase 3** | Form Implementation & Validation | ✅ Selesai |
+| **Fase 4** | CV Generator Logic               | ✅ Selesai |
+| **Fase 5** | Integration, Polishing & Testing | ✅ Selesai |
+| **Fase 6** | Performance & Deployment         | ⏳ Pending |
+
+## Catatan Pengujian
+
+Aplikasi ini telah melalui pengujian *Cross-Browser* dan *Responsive Design*
+untuk memastikan kompatibilitas yang luas.
+
+---
+
+Dibuat dengan ❤️ oleh **Gulajava Ministudio**
