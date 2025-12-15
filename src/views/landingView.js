@@ -98,7 +98,13 @@ function renderLandingView() {
         <div class="card">
           <div class="card-body p-4">
             <h3 class="card-title mb-3">
-              <i class="bi bi-info-circle"></i> Tentang CV Ta'aruf
+              <img 
+                src="/married-couple.png" 
+                alt="Married Couple Icon" 
+                class="me-2"
+                style="height: 40px; width: 40px; object-fit: contain; vertical-align: middle;"
+              />
+              Tentang CV Ta'aruf
             </h3>
             <p>
               <strong>Ta'aruf</strong> adalah proses perkenalan dalam Islam yang bertujuan 

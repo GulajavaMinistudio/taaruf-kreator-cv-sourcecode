@@ -64,7 +64,15 @@ function renderSettingsView() {
       </div>
       <div class="card-body">
         <p class="card-text">
-          <strong>Dikembangkan oleh:</strong> Gulajava Ministudio
+          <strong>Dikembangkan oleh:</strong> 
+          <a 
+            href="https://github.com/GulajavaMinistudio" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="text-decoration-none"
+          >
+            Gulajava Ministudio
+          </a>
         </p>
         <p class="card-text">
           Aplikasi ini dikembangkan sebagai proyek open-source untuk membantu 
@@ -89,6 +97,9 @@ function renderSettingsView() {
           <span class="badge bg-primary">Bootstrap 5</span>
           <span class="badge bg-primary">Vite</span>
           <span class="badge bg-primary">LocalStorage API</span>
+          <span class="badge bg-primary">Visual Studio Code</span>
+          <span class="badge bg-primary">GitHub Copilot AI</span>
+          <span class="badge bg-primary">Google Antigravity</span>
         </div>
       </div>
     </div>
@@ -102,7 +113,7 @@ function renderSettingsView() {
       </div>
       <div class="card-body">
         <p class="card-text">
-          <strong>Versi:</strong> 1.5<br>
+          <strong>Versi:</strong> 1.0<br>
           <strong>Tanggal Rilis:</strong> Desember 2025<br>
           <strong>Status:</strong> <span class="badge bg-success">Stable</span>
         </p>

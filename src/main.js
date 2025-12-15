@@ -45,6 +45,12 @@ function initApp() {
   initKeyboardNavigation();
   enableKeyboardShortcuts();
 
+  // Set current year in footer
+  const yearElement = document.getElementById("year-footer");
+  if (yearElement) {
+    yearElement.textContent = new Date().getFullYear();
+  }
+
   // Enable Bootstrap Tooltips globally
   const tooltipTriggerList = [].slice.call(
     document.querySelectorAll('[data-bs-toggle="tooltip"]')

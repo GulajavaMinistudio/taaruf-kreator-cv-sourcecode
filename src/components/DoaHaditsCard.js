@@ -41,7 +41,7 @@ const createDoaHaditsCard = (data) => {
   const safeFullContent = escapeHtml(fullContent);
 
   return `
-    <div class="${CARD_CLASS}" ${CARD_ID_ATTR}="${id}" ${CARD_CATEGORY_ATTR}="${category}">
+    <div class="card ${CARD_CLASS}" ${CARD_ID_ATTR}="${id}" ${CARD_CATEGORY_ATTR}="${category}">
       <div class="card-header">
         <h5 class="card-title mb-0">${safeTitle}</h5>
       </div>
