@@ -88,8 +88,6 @@ function loadHistory() {
   } else {
     renderHistoryList(container, sortedHistory);
   }
-
-  console.log(`[HistoryView] Loaded ${sortedHistory.length} history items`);
 }
 
 /**
@@ -210,8 +208,6 @@ function handleViewHistory(historyId) {
   // Show modal using Bootstrap
   const bsModal = new bootstrap.Modal(modal);
   bsModal.show();
-
-  console.log("[HistoryView] Viewing history:", historyId);
 }
 
 /**
@@ -236,11 +232,8 @@ async function handleCopyHistory(historyId, button) {
 
     if (button) resetButtonLoading(button);
     showToast("CV berhasil disalin ke clipboard!", "success");
-    console.log("[HistoryView] CV copied from history:", historyId);
   } catch (error) {
     // Fallback to execCommand
-    console.warn("[HistoryView] Clipboard API failed, trying fallback:", error);
-
     const textarea = document.createElement("textarea");
     textarea.value = item.cvTextContent;
     textarea.style.position = "fixed";
@@ -252,7 +245,6 @@ async function handleCopyHistory(historyId, button) {
       document.execCommand("copy");
       if (button) resetButtonLoading(button);
       showToast("CV berhasil disalin ke clipboard!", "success");
-      console.log("[HistoryView] CV copied via execCommand");
     } catch (fallbackError) {
       console.error("[HistoryView] All copy methods failed:", fallbackError);
       if (button) resetButtonLoading(button);
@@ -298,7 +290,6 @@ function handleDeleteHistory(historyId, button) {
 
     if (result.success) {
       showToast("Riwayat CV berhasil dihapus", "success");
-      console.log("[HistoryView] Deleted history:", historyId);
 
       // Reload history list
       loadHistory();

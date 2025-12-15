@@ -395,8 +395,6 @@ function handleGenerateCV() {
       // Also store source data for history
       sessionStorage.setItem("taaruf_cv_source_data", JSON.stringify(formData));
 
-      console.log("[PreviewView] CV generated successfully");
-
       // Navigate to result page
       navigateTo("/result");
     } catch (error) {

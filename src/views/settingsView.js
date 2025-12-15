@@ -201,8 +201,6 @@ function attachEventListeners() {
         );
 
         if (doubleConfirm) {
-          console.log("[SettingsView] Clearing all data...");
-
           // Show loading state
           setButtonLoading(btnReset, "Menghapus...");
 

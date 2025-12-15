@@ -66,8 +66,6 @@ function loadDrafts() {
   } else {
     renderDraftList(container, sortedDrafts);
   }
-
-  console.log(`[DraftView] Loaded ${sortedDrafts.length} drafts`);
 }
 
 /**
@@ -183,7 +181,6 @@ function handleLoadDraft(draftId, button) {
     // Navigate to form
     navigateTo("/form");
 
-    console.log("[DraftView] Loading draft:", draftId);
     showToast("Memuat draft ke formulir...", "loading");
   }, 300);
 }
@@ -212,7 +209,6 @@ function handleDeleteDraft(draftId) {
 
   if (result.success) {
     showToast("Draft berhasil dihapus", "success");
-    console.log("[DraftView] Deleted draft:", draftId);
 
     // Reload draft list
     loadDrafts();

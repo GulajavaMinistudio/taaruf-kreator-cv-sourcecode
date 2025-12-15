@@ -1205,7 +1205,6 @@ function handleSaveDraft() {
         "Draft berhasil disimpan! Anda dapat melanjutkan nanti.",
         "success"
       );
-      console.log("[FormView] Draft saved with ID:", result.data?.id);
     } else {
       showToast(result.message || "Gagal menyimpan draft", "error");
       console.error("[FormView] Save draft failed:", result);
@@ -1234,7 +1233,6 @@ export function loadDraftToForm(draftData) {
     }
   });
 
-  console.log("[FormView] Draft loaded successfully");
   showToast("Draft berhasil dimuat", "success");
 }
 
@@ -1272,7 +1270,6 @@ function handleFormSubmit() {
   // Save to sessionStorage for preview page
   try {
     sessionStorage.setItem(STORAGE_KEYS.TEMP_DATA, JSON.stringify(formData));
-    console.log("[FormView] Form data saved to sessionStorage");
 
     // Navigate to preview page
     navigateTo("/preview");
@@ -1299,7 +1296,6 @@ function handleResetForm() {
     const fields = form.querySelectorAll("input, select, textarea");
     fields.forEach((field) => clearFieldError(field));
 
-    console.log("[FormView] Form reset");
     showToast("Form berhasil direset", "info");
   }
 }
@@ -1327,11 +1323,9 @@ function initFormView() {
         loadDraftToForm(draftData);
         // Clear sessionStorage after loading
         sessionStorage.removeItem(STORAGE_KEYS.DRAFT_TO_LOAD);
-        console.log("[FormView] Draft loaded from Draft page");
       }, 100);
 
       // Exit early - draft has highest priority
-      console.log("[FormView] Form view initialized with draft data");
       return;
     } catch (error) {
       console.error("[FormView] Error loading draft:", error);
@@ -1350,20 +1344,14 @@ function initFormView() {
         loadDraftToForm(formData);
         // Clear temp data after restoring to prevent conflicts
         sessionStorage.removeItem(STORAGE_KEYS.TEMP_DATA);
-        console.log(
-          "[FormView] Restored data from preview (temp data cleared)"
-        );
       }, 100);
 
-      console.log("[FormView] Form view initialized with preview data");
       return;
     } catch (error) {
       console.error("[FormView] Error loading temp data:", error);
       showToast("Gagal memuat data dari preview", "error");
     }
   }
-
-  console.log("[FormView] Form view initialized with real-time validation");
 }
 
 // Listen for view change event

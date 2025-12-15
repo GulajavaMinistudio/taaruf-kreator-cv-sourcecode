@@ -143,8 +143,6 @@ const showToast = (options, typeParam) => {
 
   // Show toast
   toastInstance.show();
-
-  console.log(`[ToastNotification] Showed ${type} toast: ${title}`);
 };
 
 /**

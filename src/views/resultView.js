@@ -122,16 +122,12 @@ async function handleCopyToClipboard() {
       btnCopy.classList.remove("btn-success");
       btnCopy.classList.add("btn-primary");
     }, 2000);
-
-    console.log("[ResultView] CV copied to clipboard via Clipboard API");
   } catch (err) {
     // Fallback to execCommand for older browsers
-    console.warn("[ResultView] Clipboard API failed, trying execCommand:", err);
     try {
       cvOutput.select();
       document.execCommand("copy");
       showToast("CV berhasil disalin ke clipboard!", "success");
-      console.log("[ResultView] CV copied via execCommand");
     } catch (fallbackErr) {
       console.error("[ResultView] All copy methods failed:", fallbackErr);
       showToast("Gagal menyalin. Silakan gunakan Ctrl+A dan Ctrl+C.", "error");
@@ -162,7 +158,6 @@ function handleSaveHistory() {
 
     if (result.success) {
       showToast("CV berhasil disimpan ke history!", "success");
-      console.log("[ResultView] CV saved to history:", result.data?.id);
 
       // Disable button after saving
       const btnSave = document.getElementById("btn-save-history");
@@ -221,8 +216,6 @@ function handlePrintCV() {
   setTimeout(() => {
     printWindow.print();
   }, 250);
-
-  console.log("[ResultView] Print dialog opened");
 }
 
 /**
@@ -237,7 +230,6 @@ function handleNewCV() {
   // Navigate to form
   showToast("Membuat CV baru. Silakan isi formulir.", "info");
   navigateTo("/form");
-  console.log("[ResultView] Starting new CV, sessionStorage cleared");
 }
 
 /**
@@ -287,7 +279,6 @@ function initResultView() {
   // Clear temporary form data after CV is generated
   // This prevents conflicts when loading drafts later
   sessionStorage.removeItem(STORAGE_KEYS.TEMP_DATA);
-  console.log("[ResultView] Cleared temporary form data");
 }
 
 // Listen for view change event
