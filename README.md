@@ -136,6 +136,10 @@ Saat ini project telah menyelesaikan **Fase 5** (Feature Integration & Testing).
 Aplikasi ini telah melalui pengujian *Cross-Browser* dan *Responsive Design*
 untuk memastikan kompatibilitas yang luas.
 
+## Lisensi
+
+Project ini dilisensikan di bawah [MIT License](LICENSE).
+
 ---
 
 Dibuat dengan ❤️ oleh **Gulajava Ministudio**
