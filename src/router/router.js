@@ -125,12 +125,6 @@ function initRouter() {
       navigateTo(path);
     }
   });
-
-  console.log(
-    "[Router] Initialized with",
-    Object.keys(routes).length,
-    "routes"
-  );
 }
 
 /**

@@ -131,8 +131,6 @@ const attachCopyListeners = (containerId) => {
           button.classList.remove("btn-success");
           button.classList.add("btn-outline-primary");
         }, COPY_SUCCESS_DURATION);
-
-        console.log(`[DoaHaditsCard] Content copied for ID: ${id}`);
       } catch (err) {
         console.error("[DoaHaditsCard] Failed to copy:", err);
         alert("Gagal menyalin teks. Silakan copy manual.");

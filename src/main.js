@@ -36,8 +36,6 @@ window.bootstrap = bootstrap;
  * Application Initialization
  */
 function initApp() {
-  console.log("[App] Initializing Taaruf CV Kreator...");
-
   // Initialize Router (handles view switching and navigation)
   initRouter();
 
@@ -58,10 +56,6 @@ function initApp() {
   tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
-
-  console.log("[App] Router initialized successfully");
-  console.log("[App] Keyboard navigation & accessibility enabled");
-  console.log("[App] Phase 5.4: UI/UX Polish & Refinements - COMPLETED");
 }
 
 // Initialize app when DOM is ready

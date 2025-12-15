@@ -468,12 +468,6 @@ export function initializeRealTimeValidation(formElement) {
         validateFieldOnEvent(field, true); // Only validate if has state
       });
     });
-
-    console.log(
-      "[ValidationService] Real-time validation initialized for",
-      fields.length,
-      "fields"
-    );
   } catch (error) {
     console.error(
       "[ValidationService] Error initializing real-time validation:",

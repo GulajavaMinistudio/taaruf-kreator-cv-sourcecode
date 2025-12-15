@@ -99,7 +99,7 @@ function renderLandingView() {
           <div class="card-body p-4">
             <h3 class="card-title mb-3">
               <img 
-                src="/married-couple.png" 
+                src="./married-couple.png" 
                 alt="Married Couple Icon" 
                 class="me-2"
                 style="height: 40px; width: 40px; object-fit: contain; vertical-align: middle;"
