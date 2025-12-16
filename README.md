@@ -62,12 +62,14 @@ untuk memastikan performa dan kemudahan pengembangan:
 ### Performance Metrics
 
 ✅ **Lighthouse Score: 100/100**
+
 - Performance: 100
 - Accessibility: 100
 - Best Practices: 100
 - SEO: 100
 
 **Bundle Size (Production)**:
+
 - HTML: 7.44 KB (gzipped: 1.96 KB)
 - CSS: 321 KB (gzipped: 47 KB)
 - JavaScript: 186 KB (gzipped: 47 KB)
@@ -83,6 +85,7 @@ Aplikasi telah diuji dan kompatibel dengan:
 - ✅ Mobile browsers (Android Chrome, iOS Safari)
 
 **Minimum Requirements**:
+
 - JavaScript enabled
 - LocalStorage enabled (minimum 5MB available)
 - Modern browser with ES6+ support
@@ -333,21 +336,25 @@ Contributions are welcome! Please follow these guidelines:
 ### Common Issues
 
 **Issue**: Build fails with "terser not found"
+
 ```bash
 # Solution:
 npm install -D terser
 ```
 
 **Issue**: LocalStorage not available
+
 - Check browser settings (cookies/site data must be enabled)
 - Private/Incognito mode may disable LocalStorage
 - Ensure minimum 5MB storage available
 
 **Issue**: Fonts not loading in production
+
 - Check `vite.config.js` base URL matches your deployment path
 - Clear browser cache and hard refresh (Ctrl+F5)
 
 **Issue**: Routing not working after deployment
+
 - SPA requires proper server configuration for hash routing
 - For GitHub Pages: hash routing (#/) works by default
 - For custom servers: configure fallback to index.html
@@ -362,6 +369,7 @@ npm install -D terser
 - ✅ HTTPS recommended for production deployment
 
 **Data Security Best Practices**:
+
 - Users should backup their data regularly (export CV to file)
 - Clear browser data will erase LocalStorage
 - Recommend using browser profiles for separation of data
@@ -378,12 +386,14 @@ npm install -D terser
 ## Credits
 
 **Built with**:
+
 - [Bootstrap 5](https://getbootstrap.com/) - UI framework
 - [Bootstrap Icons](https://icons.getbootstrap.com/) - Icon library
 - [Vite](https://vitejs.dev/) - Build tool
 - [Google Fonts](https://fonts.google.com/) - Typography (Google Sans, Amiri)
 
 **Images**:
+
 - Background photos from [Unsplash](https://unsplash.com/)
 - Icons from [Bootstrap Icons](https://icons.getbootstrap.com/)
 
