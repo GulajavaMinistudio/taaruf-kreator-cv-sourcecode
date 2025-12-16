@@ -1,14 +1,21 @@
 /**
  * Taaruf CV Kreator - Main Entry Point
- * Phase 2: UI Skeleton & Routing Implementation
+ * Phase 6: Production Optimization
  */
 
-// Import Bootstrap CSS and JS
+// Import Bootstrap CSS
 import "bootstrap/dist/css/bootstrap.min.css";
-import * as bootstrap from "bootstrap";
 
-// Import custom styles
+// Import custom styles FIRST (to allow overrides)
 import "./style.css";
+
+// Import Bootstrap Icons AFTER custom styles (so we can override font-display)
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+// Import only necessary Bootstrap JS components (selective import)
+import { Modal } from "bootstrap";
+import { Toast } from "bootstrap";
+import { Collapse } from "bootstrap";
 
 // Import Router
 import { initRouter } from "./router/router.js";
@@ -29,8 +36,12 @@ import "./views/historyView.js";
 import "./views/doaView.js";
 import "./views/settingsView.js";
 
-// Make Bootstrap available globally
-window.bootstrap = bootstrap;
+// Make Bootstrap components available globally
+window.bootstrap = {
+  Modal,
+  Toast,
+  Collapse,
+};
 
 /**
  * Application Initialization
