@@ -16,6 +16,10 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { Modal } from "bootstrap";
 import { Toast } from "bootstrap";
 import { Collapse } from "bootstrap";
+import { Tooltip } from "bootstrap";
+
+// Expose Bootstrap components as global for views that need them
+window.bootstrap = { Modal, Toast, Collapse, Tooltip };
 
 // Import Router
 import { initRouter } from "./router/router.js";
@@ -35,13 +39,6 @@ import "./views/draftView.js";
 import "./views/historyView.js";
 import "./views/doaView.js";
 import "./views/settingsView.js";
-
-// Make Bootstrap components available globally
-window.bootstrap = {
-  Modal,
-  Toast,
-  Collapse,
-};
 
 /**
  * Application Initialization
